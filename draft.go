@@ -23,7 +23,7 @@ func main_draft() {
 	log.SetPrefix("ray_tracer: ")
 	log.SetFlags(0)
 
-	message, err := Hello("")
+	message, err := Hello_draft("")
 	if err != nil {
 		log.Fatal(err)
 	}
