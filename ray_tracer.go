@@ -3,12 +3,13 @@ package main
 import (
 	"errors"
 	"fmt"
+	"math"
 
 	"rsc.io/quote"
 )
 
 type Tuple struct {
-	x, y, z, w float32
+	x, y, z, w float64
 }
 
 func (t1 Tuple) isEqual(t2 Tuple) bool {
@@ -18,11 +19,11 @@ func (t1 Tuple) isEqual(t2 Tuple) bool {
 		isFloatEqual(t1.w, t2.w)
 }
 
-func NewPoint(x float32, y float32, z float32) *Tuple {
+func NewPoint(x float64, y float64, z float64) *Tuple {
 	return &Tuple{x, y, z, 1.0}
 }
 
-func NewVector(x float32, y float32, z float32) *Tuple {
+func NewVector(x float64, y float64, z float64) *Tuple {
 	return &Tuple{x, y, z, 0.0}
 }
 
@@ -62,7 +63,7 @@ func (t1 Tuple) negate() *Tuple {
 
 }
 
-func (t1 Tuple) scalarMultiply(scalar float32) *Tuple {
+func (t1 Tuple) scalarMultiply(scalar float64) *Tuple {
 	// For points and vectors, multiply the x, y, z coordinates by the scalar
 	if t1.isPoint() || t1.isVector() {
 		return &Tuple{t1.x * scalar, t1.y * scalar, t1.z * scalar, t1.w}
@@ -72,7 +73,7 @@ func (t1 Tuple) scalarMultiply(scalar float32) *Tuple {
 	}
 }
 
-func (t1 Tuple) scalarDivide(scalar float32) *Tuple {
+func (t1 Tuple) scalarDivide(scalar float64) *Tuple {
 	// For points and vectors, divide the x, y, z coordinates by the scalar
 	if t1.isPoint() || t1.isVector() {
 		return &Tuple{t1.x / scalar, t1.y / scalar, t1.z / scalar, t1.w}
@@ -80,6 +81,38 @@ func (t1 Tuple) scalarDivide(scalar float32) *Tuple {
 		// For other tuples, divide all coordinates by the scalar
 		return &Tuple{t1.x / scalar, t1.y / scalar, t1.z / scalar, t1.w / scalar}
 	}
+}
+
+func (t1 Tuple) magnitude() float64 {
+
+	// "magnitude" oeration is only allowed for vectors
+	// We could have returned an error here but doing so would make
+	// usage of this function cumbersome. So we return NaN instead.
+	// ASK: Is this a good idea?
+	if t1.isPoint() {
+		return math.NaN()
+	}
+	return math.Sqrt(t1.x*t1.x + t1.y*t1.y + t1.z*t1.z + t1.w*t1.w)
+}
+
+// Converts an arbitrary vector into a unit vector.
+// This keep calculations anchored relative to a common scale (the unit vector)
+func (t1 Tuple) normalize() *Tuple {
+	// "normalize" oeration is only allowed for vectors
+	// We could have returned an error here but doing so would make
+	// usage of this function cumbersome. So we return NaN instead.
+	// ASK: Is this a good idea?
+	if t1.isPoint() {
+		return &Tuple{math.NaN(), math.NaN(), math.NaN(), 1}
+	}
+
+	t1_magnitude := t1.magnitude()
+	normalized_x := t1.x / t1_magnitude
+	normalized_y := t1.y / t1_magnitude
+	normalized_z := t1.z / t1_magnitude
+	normalized_w := t1.w / t1_magnitude
+
+	return &Tuple{normalized_x, normalized_y, normalized_z, normalized_w}
 }
 
 func main() {

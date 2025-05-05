@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"math"
+	"testing"
+)
 
 func TestTupleIsPoint(t *testing.T) {
 	a := Tuple{x: 4.3, y: -4.2, z: 3.1, w: 1.0}
@@ -164,5 +167,79 @@ func TestScalarDivide(t *testing.T) {
 	a4 = a3.scalarDivide(0.5)
 	if !a4.isEqual(Tuple{2, -4, 6, 6}) {
 		t.Errorf("got: %+v, want: (2, -4, 6, 3)", a4)
+	}
+}
+
+func TestVectorMagnitude(t *testing.T) {
+	var v *Tuple
+	v = NewPoint(1, 0, 0)
+
+	if !math.IsNaN(v.magnitude()) {
+		t.Errorf("got: %f, want: NaN", v.magnitude())
+	}
+
+	v = NewVector(1, 0, 0)
+	if !isFloatEqual(v.magnitude(), 1.0) {
+		t.Errorf("got: %f, want: 1.0", v.magnitude())
+	}
+
+	v = NewVector(0, 1, 0)
+	if !isFloatEqual(v.magnitude(), 1.0) {
+		t.Errorf("got: %f, want: 1.0", v.magnitude())
+	}
+
+	v = NewVector(0, 0, 1)
+	if !isFloatEqual(v.magnitude(), 1.0) {
+		t.Errorf("got: %f, want: 1.0", v.magnitude())
+	}
+
+	v = NewVector(1, 2, 3)
+	if !isFloatEqual(v.magnitude(), math.Sqrt(14)) {
+		t.Errorf("got: %f, want: %f", v.magnitude(), math.Sqrt(14))
+	}
+
+	v = NewVector(-1, -2, -3)
+	if !isFloatEqual(v.magnitude(), math.Sqrt(14)) {
+		t.Errorf("got: %f, want: %f", v.magnitude(), math.Sqrt(14))
+	}
+
+}
+
+func TestNormalizeVector(t *testing.T) {
+	var v, v_normalized *Tuple
+	v = NewPoint(1, 0, 0)
+
+	if !math.IsNaN(v.normalize().magnitude()) {
+		t.Errorf("got: %f, want: NaN", v.normalize().magnitude())
+	}
+
+	v = NewVector(4, 0, 0)
+	v_normalized = v.normalize()
+	if !isFloatEqual(v_normalized.x, 1.0) {
+		t.Errorf("got: %f, want: 1.0", v_normalized.x)
+	}
+	if !isFloatEqual(v_normalized.y, 0.0) {
+		t.Errorf("got: %f, want: 0.0", v_normalized.y)
+	}
+	if !isFloatEqual(v_normalized.z, 0.0) {
+		t.Errorf("got: %f, want: 0.0", v_normalized.z)
+	}
+
+	v = NewVector(1, 2, 3)
+	v_normalized = v.normalize()
+	if !isFloatEqual(v_normalized.x, 0.26726) {
+		t.Errorf("got: %f, want: 0.26726", v_normalized.x)
+	}
+	if !isFloatEqual(v_normalized.y, 0.53452) {
+		t.Errorf("got: %f, want: 0.53452", v_normalized.y)
+	}
+	if !isFloatEqual(v_normalized.z, 0.80178) {
+		t.Errorf("got: %f, want: 0.80178", v_normalized.z)
+	}
+
+	// Check the magnitude of the normalized vector
+	v = NewVector(1, 2, 3)
+	if !isFloatEqual(v.normalize().magnitude(), 1.0) {
+		t.Errorf("got: %f, want: 1.0", v.normalize().magnitude())
 	}
 }
