@@ -140,4 +140,10 @@ func (v1 Vector) CrossProduct(v2 Vector) *Vector {
 
 func main() {
 	fmt.Println(quote.Glass())
+
+	// Projectile
+	p := Projectile{position: Point{0, 1, 0}, velocity: Vector{1, 1, 0}}
+	e := Environment{gravity: Vector{0, -0.1, 0}, wind: Vector{-0.01, 0, 0}}
+	finalProjection := ThrowProjectile(e, p)
+	fmt.Printf("\nfinal projectile position: %v+\n", finalProjection.position)
 }
