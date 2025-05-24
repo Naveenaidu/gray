@@ -1,144 +1,119 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"math"
 
 	"rsc.io/quote"
 )
 
-type Tuple struct {
-	x, y, z, w float64
+/* ------------- Point --------------- */
+type Point struct {
+	x, y, z float64
 }
 
-func (t1 Tuple) isEqual(t2 Tuple) bool {
-	return isFloatEqual(t1.x, t2.x) &&
-		isFloatEqual(t1.y, t2.y) &&
-		isFloatEqual(t1.z, t2.z) &&
-		isFloatEqual(t1.w, t2.w)
+func NewPoint(x float64, y float64, z float64) *Point {
+	return &Point{x, y, z}
 }
 
-func NewPoint(x float64, y float64, z float64) *Tuple {
-	return &Tuple{x, y, z, 1.0}
+func (p1 Point) IsEqual(p2 Point) bool {
+	return isFloatEqual(p1.x, p2.x) &&
+		isFloatEqual(p1.y, p2.y) &&
+		isFloatEqual(p1.z, p2.z)
 }
 
-func NewVector(x float64, y float64, z float64) *Tuple {
-	return &Tuple{x, y, z, 0.0}
+// Add a vector to a point, gives a new point
+// This is equivalent to walking from a point in the direction of the vector
+func (p1 Point) AddVector(v1 Vector) *Point {
+	return &Point{p1.x + v1.x, p1.y + v1.y, p1.z + v1.z}
 }
 
-func (t1 Tuple) isPoint() bool {
-	return t1.w == 1.0
+// subtracting two points finds the vector between the points
+func (p1 Point) Subtract(p2 Point) *Vector {
+	return &Vector{p1.x - p2.x, p1.y - p2.y, p1.z - p2.z}
 }
 
-func (t1 Tuple) isVector() bool {
-	return t1.w == 0.0
+// Subtract a vector from a point, gives a new point
+// This is equivalent to walking from a point in the direction of the vector
+func (p1 Point) SubtractVector(v1 Vector) *Point {
+	return &Point{p1.x - v1.x, p1.y - v1.y, p1.z - v1.z}
 }
 
-// FIXME: instead of error, send back NaN - easier to work with
-// Also send back Tuple instead of *Tuple
-// t1 +  t2
-func (t1 Tuple) add(t2 Tuple) (*Tuple, error) {
-	// Adding two Points do not make sense. Points can only be added to a vector
-	if t1.isPoint() && t2.isPoint() {
-		return nil, errors.New("two points cannot be added")
-	}
-	return &Tuple{t1.x + t2.x, t1.y + t2.y, t1.z + t2.z, t1.w + t2.w}, nil
+func (p1 Point) Negate() *Point {
+	return &Point{-p1.x, -p1.y, -p1.z}
 }
 
-// t1 - t2
-func (t1 Tuple) subtract(t2 Tuple) (*Tuple, error) {
-	// Subtracting a point from a vector is not a standard vector operation
-	if t1.isVector() && t2.isPoint() {
-		return nil, errors.New("subtracting a point from a vector is not allowed")
-	}
-	return &Tuple{t1.x - t2.x, t1.y - t2.y, t1.z - t2.z, t1.w - t2.w}, nil
+func (p1 Point) ScalarMultiply(scalar float64) *Point {
+	return &Point{p1.x * scalar, p1.y * scalar, p1.z * scalar}
 }
 
-func (t1 Tuple) negate() *Tuple {
-	// For points and vectors, negate the x, y, z coordinates
-	if t1.isPoint() || t1.isVector() {
-		return &Tuple{-t1.x, -t1.y, -t1.z, t1.w}
-	} else {
-		return &Tuple{-t1.x, -t1.y, -t1.z, -t1.w}
-	}
-
+func (p1 Point) ScalarDivide(scalar float64) *Point {
+	return &Point{p1.x / scalar, p1.y / scalar, p1.z / scalar}
 }
 
-func (t1 Tuple) scalarMultiply(scalar float64) *Tuple {
-	// For points and vectors, multiply the x, y, z coordinates by the scalar
-	if t1.isPoint() || t1.isVector() {
-		return &Tuple{t1.x * scalar, t1.y * scalar, t1.z * scalar, t1.w}
-	} else {
-		// For other tuples, multiply all coordinates by the scalar
-		return &Tuple{t1.x * scalar, t1.y * scalar, t1.z * scalar, t1.w * scalar}
-	}
+/* ------------- Vector --------------- */
+type Vector struct {
+	x, y, z float64
 }
 
-func (t1 Tuple) scalarDivide(scalar float64) *Tuple {
-	// For points and vectors, divide the x, y, z coordinates by the scalar
-	if t1.isPoint() || t1.isVector() {
-		return &Tuple{t1.x / scalar, t1.y / scalar, t1.z / scalar, t1.w}
-	} else {
-		// For other tuples, divide all coordinates by the scalar
-		return &Tuple{t1.x / scalar, t1.y / scalar, t1.z / scalar, t1.w / scalar}
-	}
+func NewVector(x float64, y float64, z float64) *Vector {
+	return &Vector{x, y, z}
 }
 
-func (t1 Tuple) magnitude() float64 {
+func (v1 Vector) IsEqual(v2 Vector) bool {
+	return isFloatEqual(v1.x, v2.x) &&
+		isFloatEqual(v1.y, v2.y) &&
+		isFloatEqual(v1.z, v2.z)
+}
 
-	// "magnitude" oeration is only allowed for vectors
-	// We could have returned an error here but doing so would make
-	// usage of this function cumbersome. So we return NaN instead.
-	// ASK: Is this a good idea?
-	if t1.isPoint() {
-		return math.NaN()
-	}
-	return math.Sqrt(t1.x*t1.x + t1.y*t1.y + t1.z*t1.z + t1.w*t1.w)
+func (v1 Vector) Add(v2 Vector) *Vector {
+	return &Vector{v1.x + v2.x, v1.y + v2.y, v1.z + v2.z}
+}
+
+func (v1 Vector) Subtract(v2 Vector) *Vector {
+	return &Vector{v1.x - v2.x, v1.y - v2.y, v1.z - v2.z}
+}
+
+func (v1 Vector) Negate() *Vector {
+	return &Vector{-v1.x, -v1.y, -v1.z}
+}
+
+func (v1 Vector) ScalarMultiply(scalar float64) *Vector {
+	return &Vector{v1.x * scalar, v1.y * scalar, v1.z * scalar}
+}
+
+func (v1 Vector) ScalarDivide(scalar float64) *Vector {
+	return &Vector{v1.x / scalar, v1.y / scalar, v1.z / scalar}
+}
+
+func (v Vector) Magnitude() float64 {
+	return math.Sqrt(v.x*v.x + v.y*v.y + v.z*v.z)
 }
 
 // Converts an arbitrary vector into a unit vector.
 // This keep calculations anchored relative to a common scale (the unit vector)
-func (t1 Tuple) normalize() *Tuple {
-	// "normalize" oeration is only allowed for vectors
-	// We could have returned an error here but doing so would make
-	// usage of this function cumbersome. So we return NaN instead.
-	// ASK: Is this a good idea?
-	if t1.isPoint() {
-		return &Tuple{math.NaN(), math.NaN(), math.NaN(), 1}
-	}
-
-	t1_magnitude := t1.magnitude()
-	normalized_x := t1.x / t1_magnitude
-	normalized_y := t1.y / t1_magnitude
-	normalized_z := t1.z / t1_magnitude
-	normalized_w := t1.w / t1_magnitude
-
-	return &Tuple{normalized_x, normalized_y, normalized_z, normalized_w}
+func (v1 Vector) Normalize() *Vector {
+	v1_magnitude := v1.Magnitude()
+	normalized_x := v1.x / v1_magnitude
+	normalized_y := v1.y / v1_magnitude
+	normalized_z := v1.z / v1_magnitude
+	return &Vector{normalized_x, normalized_y, normalized_z}
 }
 
 // Calculates the dot product of vector
 // one use case, dot products of unit vectors help find the angle between vectors
-func (t1 Tuple) dotProduct(t2 Tuple) float64 {
-	if t1.isPoint() {
-		return math.NaN()
-	}
-
-	return (t1.x*t2.x + t1.y*t2.y + t1.z*t2.z + t1.w*t2.w)
+func (v1 Vector) DotProduct(v2 Vector) float64 {
+	return (v1.x*v2.x + v1.y*v2.y + v1.z*v2.z)
 }
 
 // Cross product
 // cross product of X and Y gets Z, Y and Z get X, i.e results are always perpendicular
-func (t1 Tuple) crossProduct(t2 Tuple) *Tuple {
-	if t1.isPoint() {
-		return &Tuple{math.NaN(), math.NaN(), math.NaN(), 1}
-	}
+func (v1 Vector) CrossProduct(v2 Vector) *Vector {
+	crossProduct_x := v1.y*v2.z - v1.z*v2.y
+	crossProduct_y := v1.z*v2.x - v1.x*v2.z
+	crossProduct_z := v1.x*v2.y - v1.y*v2.x
 
-	crossProduct_x := t1.y*t2.z - t1.z*t2.y
-	crossProduct_y := t1.z*t2.x - t1.x*t2.z
-	crossProduct_z := t1.x*t2.y - t1.y*t2.x
-
-	return &Tuple{crossProduct_x, crossProduct_y, crossProduct_z, 0}
+	return &Vector{crossProduct_x, crossProduct_y, crossProduct_z}
 }
 
 func main() {
