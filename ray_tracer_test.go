@@ -18,7 +18,7 @@ func TestAddTuples(t *testing.T) {
 	// Case 2: Adding two vectors gives a new vector
 	c2v1 := NewVector(3, -2, 5)
 	c2v2 := NewVector(-2, 3, 1)
-	c2v3 := c2v1.Add(*c2v2)
+	c2v3 := AddVectors([]Vector{*c2v1, *c2v2})
 	if !c2v3.IsEqual(*NewVector(1, 1, 6)) {
 		t.Errorf("got: %+v, want: (1, 1, 6, 0)", c2v3)
 	}
@@ -48,14 +48,14 @@ func TestSubtractTuples(t *testing.T) {
 	// Case 3: Subtract two vectors, gives a new vector
 	c3v1 := NewVector(3, 2, 1)
 	c3v2 := NewVector(5, 6, 7)
-	c3v3 := c3v1.Subtract(*c3v2)
+	c3v3 := SubtractVectors([]Vector{*c3v1, *c3v2})
 	if !c3v3.IsEqual(*NewVector(-2, -4, -6)) {
 		t.Errorf("got: %+v, want: (-2, -4, -6, 0)", c3v3)
 	}
 
 	// Case 4: Subtract a vector from itself, gives a zero vector
 	c4v1 := NewVector(3, 2, 1)
-	c4v2 := c4v1.Subtract(*c4v1)
+	c4v2 := SubtractVectors([]Vector{*c4v1, *c4v1})
 	if !c4v2.IsEqual(*NewVector(0, 0, 0)) {
 		t.Errorf("got: %+v, want: (0, 0, 0, 0)", c4v2)
 	}

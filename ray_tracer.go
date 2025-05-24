@@ -66,12 +66,34 @@ func (v1 Vector) IsEqual(v2 Vector) bool {
 		isFloatEqual(v1.z, v2.z)
 }
 
-func (v1 Vector) Add(v2 Vector) *Vector {
+func (v1 Vector) add(v2 Vector) *Vector {
 	return &Vector{v1.x + v2.x, v1.y + v2.y, v1.z + v2.z}
 }
 
-func (v1 Vector) Subtract(v2 Vector) *Vector {
+func AddVectors(vlist []Vector) *Vector {
+	vectorSum := Vector{}
+
+	for _, vec := range vlist {
+		vectorSum = *vectorSum.add(vec)
+	}
+
+	return &vectorSum
+
+}
+
+func (v1 Vector) subtract(v2 Vector) *Vector {
 	return &Vector{v1.x - v2.x, v1.y - v2.y, v1.z - v2.z}
+}
+
+// The vectors are subtracted in the order they are passed
+// For eg: v3 = v1 - v2 is denoted by SubtractVector(v1, v2)
+func SubtractVectors(vlist []Vector) *Vector {
+	result := vlist[0]
+	for i := 1; i < len(vlist); i++ {
+		result = *result.subtract(vlist[i])
+	}
+
+	return &result
 }
 
 func (v1 Vector) Negate() *Vector {
