@@ -35,6 +35,8 @@ func (t1 Tuple) isVector() bool {
 	return t1.w == 0.0
 }
 
+// FIXME: instead of error, send back NaN - easier to work with
+// Also send back Tuple instead of *Tuple
 // t1 +  t2
 func (t1 Tuple) add(t2 Tuple) (*Tuple, error) {
 	// Adding two Points do not make sense. Points can only be added to a vector
@@ -113,6 +115,30 @@ func (t1 Tuple) normalize() *Tuple {
 	normalized_w := t1.w / t1_magnitude
 
 	return &Tuple{normalized_x, normalized_y, normalized_z, normalized_w}
+}
+
+// Calculates the dot product of vector
+// one use case, dot products of unit vectors help find the angle between vectors
+func (t1 Tuple) dotProduct(t2 Tuple) float64 {
+	if t1.isPoint() {
+		return math.NaN()
+	}
+
+	return (t1.x*t2.x + t1.y*t2.y + t1.z*t2.z + t1.w*t2.w)
+}
+
+// Cross product
+// cross product of X and Y gets Z, Y and Z get X, i.e results are always perpendicular
+func (t1 Tuple) crossProduct(t2 Tuple) *Tuple {
+	if t1.isPoint() {
+		return &Tuple{math.NaN(), math.NaN(), math.NaN(), 1}
+	}
+
+	crossProduct_x := t1.y*t2.z - t1.z*t2.y
+	crossProduct_y := t1.z*t2.x - t1.x*t2.z
+	crossProduct_z := t1.x*t2.y - t1.y*t2.x
+
+	return &Tuple{crossProduct_x, crossProduct_y, crossProduct_z, 0}
 }
 
 func main() {

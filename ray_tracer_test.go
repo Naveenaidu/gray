@@ -243,3 +243,33 @@ func TestNormalizeVector(t *testing.T) {
 		t.Errorf("got: %f, want: 1.0", v.normalize().magnitude())
 	}
 }
+
+func TestDotProduct(t *testing.T) {
+	a := NewVector(1, 2, 3)
+	b := NewVector(2, 3, 4)
+
+	dotProduct := a.dotProduct(*b)
+
+	if dotProduct != 20.0 {
+		t.Errorf("got: %f, want: 20.0", dotProduct)
+	}
+
+}
+
+func TestCrossProduct(t *testing.T) {
+	a := NewVector(1, 2, 3)
+	b := NewVector(2, 3, 4)
+
+	abCrossProduct := a.crossProduct(*b)
+
+	if !abCrossProduct.isEqual(*NewVector(-1, 2, -1)) {
+		t.Errorf("got: %+v, want: (-1, 2, -1)", abCrossProduct)
+	}
+
+	baCrossProduct := b.crossProduct(*a)
+
+	if !baCrossProduct.isEqual(*NewVector(1, -2, 1)) {
+		t.Errorf("got: %+v, want: (-1, 2, -1)", baCrossProduct)
+	}
+
+}
