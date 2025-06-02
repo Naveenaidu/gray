@@ -190,3 +190,11 @@ func TestCrossProduct(t *testing.T) {
 	}
 
 }
+
+/* ------------- Canvas --------------- */
+
+// func TestNewCanvas(t *testing.T) {
+// 	canvas := NewCanvas(10, 20, *Black)
+
+// 	for i:= ran
+// }

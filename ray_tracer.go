@@ -147,3 +147,104 @@ func main() {
 	finalProjection := ThrowProjectile(e, p)
 	fmt.Printf("\nfinal projectile position: %v+\n", finalProjection.position)
 }
+
+/* ------------- Colors --------------- */
+
+type Color struct {
+	x, y, z float64
+}
+
+var Red = NewColor(1.0, 0.0, 0.0)
+var Green = NewColor(0.0, 1.0, 0.0)
+var Blue = NewColor(0.0, 0.0, 1.0)
+var Black = NewColor(0.0, 0.0, 0.0)
+
+func NewColor(x float64, y float64, z float64) *Color {
+	return &Color{x, y, z}
+}
+
+func (v1 Color) IsEqual(v2 Color) bool {
+	return isFloatEqual(v1.x, v2.x) &&
+		isFloatEqual(v1.y, v2.y) &&
+		isFloatEqual(v1.z, v2.z)
+}
+
+func (v1 Color) add(v2 Color) *Color {
+	return &Color{v1.x + v2.x, v1.y + v2.y, v1.z + v2.z}
+}
+
+func AddColors(vlist []Color) *Color {
+	ColorSum := Color{}
+
+	for _, vec := range vlist {
+		ColorSum = *ColorSum.add(vec)
+	}
+
+	return &ColorSum
+
+}
+
+func (v1 Color) subtract(v2 Color) *Color {
+	return &Color{v1.x - v2.x, v1.y - v2.y, v1.z - v2.z}
+}
+
+// The Colors are subtracted in the order they are passed
+// For eg: v3 = v1 - v2 is denoted by SubtractColor(v1, v2)
+func SubtractColors(vlist []Color) *Color {
+	result := vlist[0]
+	for i := 1; i < len(vlist); i++ {
+		result = *result.subtract(vlist[i])
+	}
+
+	return &result
+}
+
+func (v1 Color) multiply(v2 Color) *Color {
+	return &Color{v1.x * v2.x, v1.y * v2.y, v1.z * v2.z}
+}
+
+// The Colors are multiplied in the order they are passed
+// Also called as "hadamard_product"
+// For eg: v3 = v1 * v2 is denoted by MultiplyColors(v1, v2)
+func MultiplyColors(vlist []Color) *Color {
+	result := vlist[0]
+	for i := 1; i < len(vlist); i++ {
+		result = *result.multiply(vlist[i])
+	}
+
+	return &result
+}
+
+/* ------------- Canvas --------------- */
+
+type Canvas struct {
+	width  int
+	height int
+	color  [][]Color // represents the colors of each pixel
+}
+
+func NewCanvas(width int, height int, color Color) *Canvas {
+	canvas := &Canvas{}
+	canvas.height = height
+	canvas.width = width
+
+	// Create the color slice
+	canvas.color = make([][]Color, canvas.height)
+	for i := range canvas.color {
+		canvas.color[i] = make([]Color, width)
+	}
+
+	// the default value of float32 is 0.0
+	// hence no need to initialze it with 0's
+	if color.IsEqual(*Black) {
+		return canvas
+	}
+
+	for i := 0; i < canvas.height; i++ {
+		for j := 0; j < canvas.width; j++ {
+			canvas.color[i][j] = color
+		}
+	}
+
+	return canvas
+}
