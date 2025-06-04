@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"math"
+	"os"
 
 	"rsc.io/quote"
 )
@@ -151,7 +153,7 @@ func main() {
 /* ------------- Colors --------------- */
 
 type Color struct {
-	x, y, z float64
+	r, g, b float64
 }
 
 var Red = NewColor(1.0, 0.0, 0.0)
@@ -159,18 +161,26 @@ var Green = NewColor(0.0, 1.0, 0.0)
 var Blue = NewColor(0.0, 0.0, 1.0)
 var Black = NewColor(0.0, 0.0, 0.0)
 
-func NewColor(x float64, y float64, z float64) *Color {
-	return &Color{x, y, z}
+func NewColor(r float64, g float64, b float64) *Color {
+	return &Color{r, g, b}
 }
 
-func (v1 Color) IsEqual(v2 Color) bool {
-	return isFloatEqual(v1.x, v2.x) &&
-		isFloatEqual(v1.y, v2.y) &&
-		isFloatEqual(v1.z, v2.z)
+func (c1 Color) IsEqual(c2 Color) bool {
+	return isFloatEqual(c1.r, c2.r) &&
+		isFloatEqual(c1.g, c2.g) &&
+		isFloatEqual(c1.b, c2.b)
 }
 
-func (v1 Color) add(v2 Color) *Color {
-	return &Color{v1.x + v2.x, v1.y + v2.y, v1.z + v2.z}
+func (c *Color) clamp() *Color {
+	c.r = Clamp(c.r)
+	c.g = Clamp(c.g)
+	c.b = Clamp(c.b)
+
+	return c
+}
+
+func (c1 Color) add(c2 Color) *Color {
+	return &Color{c1.r + c2.r, c1.g + c2.g, c1.b + c2.b}
 }
 
 func AddColors(vlist []Color) *Color {
@@ -184,8 +194,8 @@ func AddColors(vlist []Color) *Color {
 
 }
 
-func (v1 Color) subtract(v2 Color) *Color {
-	return &Color{v1.x - v2.x, v1.y - v2.y, v1.z - v2.z}
+func (c1 Color) subtract(c2 Color) *Color {
+	return &Color{c1.r - c2.r, c1.g - c2.g, c1.b - c2.b}
 }
 
 // The Colors are subtracted in the order they are passed
@@ -199,8 +209,8 @@ func SubtractColors(vlist []Color) *Color {
 	return &result
 }
 
-func (v1 Color) multiply(v2 Color) *Color {
-	return &Color{v1.x * v2.x, v1.y * v2.y, v1.z * v2.z}
+func (c1 Color) multiply(c2 Color) *Color {
+	return &Color{c1.r * c2.r, c1.g * c2.g, c1.b * c2.b}
 }
 
 // The Colors are multiplied in the order they are passed
@@ -223,15 +233,30 @@ type Canvas struct {
 	color  [][]Color // represents the colors of each pixel
 }
 
+/*
+Canvas looks like this
+
+	  (0,0) -------------> (width) (X axis)
+			|
+			|
+			|
+			|
+			|
+		    \/
+		   (height) (Y axis)
+*/
 func NewCanvas(width int, height int, color Color) *Canvas {
 	canvas := &Canvas{}
 	canvas.height = height
 	canvas.width = width
 
 	// Create the color slice
-	canvas.color = make([][]Color, canvas.height)
-	for i := range canvas.color {
-		canvas.color[i] = make([]Color, width)
+	// The X-axis corresponds to the outer slice of canvas.color, representing the
+	// width of the canvas. Each element in this outer slice is an inner slice
+	// (subarray) that represents the Y-axis, or the height of the canvas.
+	canvas.color = make([][]Color, canvas.width)
+	for x := range canvas.color {
+		canvas.color[x] = make([]Color, canvas.height)
 	}
 
 	// the default value of float32 is 0.0
@@ -240,11 +265,57 @@ func NewCanvas(width int, height int, color Color) *Canvas {
 		return canvas
 	}
 
-	for i := 0; i < canvas.height; i++ {
-		for j := 0; j < canvas.width; j++ {
-			canvas.color[i][j] = color
+	for x := 0; x < canvas.width; x++ {
+		for y := 0; y < canvas.height; y++ {
+			canvas.color[x][y] = color
 		}
 	}
 
 	return canvas
+}
+
+func (c *Canvas) WritePixel(x int, y int, color Color) {
+	c.color[x][y] = color
+}
+
+func (c *Canvas) PixelAt(x int, y int) Color {
+	return c.color[x][y]
+}
+
+func (c *Canvas) WriteToPPM(fileName string) error {
+
+	f, err := os.Create(fileName)
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	w := bufio.NewWriter(f)
+
+	//Write the PPM header
+	_, err = w.WriteString(fmt.Sprintf("P3\n%d %d\n255\n", c.width, c.height))
+	if err != nil {
+		return err
+	}
+
+	for y := 0; y < c.height; y++ {
+		for x := 0; x < c.width; x++ {
+			color := c.color[x][y].clamp()
+			r := int(color.r * 255)
+			g := int(color.g * 255)
+			b := int(color.b * 255)
+			_, err = w.WriteString(fmt.Sprintf("%d %d %d\n", r, g, b))
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	// Flush the writer
+	err = w.Flush()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

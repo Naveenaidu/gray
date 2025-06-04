@@ -193,8 +193,24 @@ func TestCrossProduct(t *testing.T) {
 
 /* ------------- Canvas --------------- */
 
-// func TestNewCanvas(t *testing.T) {
-// 	canvas := NewCanvas(10, 20, *Black)
+func TestNewCanvas(t *testing.T) {
+	canvas := NewCanvas(10, 20, *Black)
 
-// 	for i:= ran
-// }
+	for x := 0; x < canvas.width; x++ {
+		for y := 0; y < canvas.height; y++ {
+			if canvas.color[x][y] != *Black {
+				t.Errorf("got: %+v, want: %+v", canvas.color[x][y], *Black)
+			}
+		}
+	}
+}
+
+func TestCanvasWritePixel(t *testing.T) {
+	canvas := NewCanvas(80, 80, *Black)
+	canvas.WritePixel(2, 3, *Red)
+
+	if canvas.PixelAt(2, 3) != *Red {
+		t.Errorf("got: %+v, want: %+v", canvas.PixelAt(2, 3), *Red)
+	}
+
+}
