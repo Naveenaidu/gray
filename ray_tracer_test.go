@@ -214,3 +214,102 @@ func TestCanvasWritePixel(t *testing.T) {
 	}
 
 }
+
+/* ------------- Matrix --------------- */
+
+func TestNewMatrix(t *testing.T) {
+	/*
+		Creates a matrix like below:
+
+		1.00   2.00   3.00   4.00
+		5.50   6.50   7.50   8.50
+		9.00  10.00  11.00  12.00
+		13.50  14.50  15.50  16.50
+
+		Note that the columns are sent as arrays
+	*/
+	matrix := NewMatrix(4, 4, [][]float64{{1, 5.5, 9, 13.5}, {2, 6.5, 10, 14.5}, {3, 7.5, 11, 15.5}, {4, 8.5, 12, 16.5}})
+	matrix.PrintMatrix()
+
+	if matrix.value[0][0] != 1 {
+		t.Errorf("got: %f, want: %f", matrix.value[0][0], 1.0)
+	}
+
+	if matrix.value[0][3] != 4 {
+		t.Errorf("got: %f, want: %f", matrix.value[0][3], 4.0)
+	}
+
+	if matrix.value[1][0] != 5.5 {
+		t.Errorf("got: %f, want: %f", matrix.value[1][0], 5.5)
+	}
+
+	if matrix.value[1][2] != 7.5 {
+		t.Errorf("got: %f, want: %f", matrix.value[1][2], 7.5)
+	}
+
+	if matrix.value[2][2] != 11 {
+		t.Errorf("got: %f, want: %f", matrix.value[2][2], 11.0)
+	}
+
+	if matrix.value[3][0] != 13.5 {
+		t.Errorf("got: %f, want: %f", matrix.value[3][0], 13.5)
+	}
+
+	if matrix.value[3][2] != 15.5 {
+		t.Errorf("got: %f, want: %f", matrix.value[3][2], 15.5)
+	}
+}
+
+func Test2x2Matrix(t *testing.T) {
+	matrix := NewMatrix(2, 2, [][]float64{{-3, 1}, {5, -2}})
+	matrix.PrintMatrix()
+
+	value := matrix.value[0][0]
+	expectedValue := -3.0
+	if value != expectedValue {
+		t.Errorf("got: %f, want: %f", value, expectedValue)
+	}
+
+	value = matrix.value[0][1]
+	expectedValue = 5.0
+	if value != expectedValue {
+		t.Errorf("got: %f, want: %f", value, expectedValue)
+	}
+
+	value = matrix.value[1][0]
+	expectedValue = 1.0
+	if value != expectedValue {
+		t.Errorf("got: %f, want: %f", value, expectedValue)
+	}
+
+	value = matrix.value[1][1]
+	expectedValue = -2.0
+	if value != expectedValue {
+		t.Errorf("got: %f, want: %f", value, expectedValue)
+	}
+
+}
+
+func Test3x3Matrix(t *testing.T) {
+	matrix := NewMatrix(3, 3, [][]float64{{-3, 1, 0}, {5, -2, 1}, {0, -7, 1}})
+	matrix.PrintMatrix()
+
+	value := matrix.value[0][0]
+	expectedValue := -3.0
+	if value != expectedValue {
+		t.Errorf("got: %f, want: %f", value, expectedValue)
+	}
+
+	value = matrix.value[1][1]
+	expectedValue = -2.0
+	if value != expectedValue {
+		t.Errorf("got: %f, want: %f", value, expectedValue)
+	}
+
+	value = matrix.value[2][2]
+	expectedValue = 1.0
+	if value != expectedValue {
+		t.Errorf("got: %f, want: %f", value, expectedValue)
+	}
+
+}

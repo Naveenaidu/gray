@@ -307,3 +307,43 @@ func (c *Canvas) WriteToPPM(fileName string) error {
 
 	return nil
 }
+
+/* ------------- Matrices --------------- */
+
+type Matrix struct {
+	rows    int
+	columns int
+	value   [][]float64
+}
+
+// Create a new matrix
+// each element of columns array define the columns of a matrix
+func NewMatrix(num_rows int, num_cols int, columns [][]float64) *Matrix {
+	matrix := &Matrix{}
+	matrix.rows = num_rows
+	matrix.columns = num_cols
+
+	matrix.value = make([][]float64, matrix.rows)
+	for r := range matrix.value {
+		matrix.value[r] = make([]float64, matrix.columns)
+	}
+
+	for c := 0; c < matrix.columns; c++ {
+		for r := 0; r < matrix.rows; r++ {
+			matrix.value[c][r] = columns[r][c]
+		}
+	}
+
+	return matrix
+
+}
+
+// PrintMatrix prints the matrix in a formatted way
+func (m *Matrix) PrintMatrix() {
+	for r := 0; r < m.rows; r++ {
+		for c := 0; c < m.columns; c++ {
+			fmt.Printf("%6.2f ", m.value[r][c]) // Format each value to 2 decimal places
+		}
+		fmt.Println() // Move to the next row
+	}
+}
