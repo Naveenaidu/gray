@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-
-	"rsc.io/quote"
 )
 
 type Projectile struct {
@@ -51,19 +49,31 @@ func ThrowProjectile(env Environment, proj Projectile, canvas *Canvas) Projectil
 }
 
 func main() {
-	fmt.Println(quote.Glass())
+	// fmt.Println(quote.Glass())
 
-	start := Point{0, 1, 0}
-	velocity := Vector{1, 1.8, 0}.Normalize().ScalarMultiply(11.25)
-	gravity := Vector{0, -0.1, 0}
-	wind := Vector{-0.01, 0, 0}
+	// start := Point{0, 1, 0}
+	// velocity := Vector{1, 1.8, 0}.Normalize().ScalarMultiply(11.25)
+	// gravity := Vector{0, -0.1, 0}
+	// wind := Vector{-0.01, 0, 0}
 
-	canvas := NewCanvas(900, 500, *Black)
+	// canvas := NewCanvas(900, 500, *Black)
 
-	// Projectile
-	p := Projectile{position: start, velocity: *velocity}
-	e := Environment{gravity: gravity, wind: wind}
-	finalProjection := ThrowProjectile(e, p, canvas)
-	canvas.WriteToPPM("projectile.ppm")
-	fmt.Printf("\nfinal projectile position: %v+\n", finalProjection.position)
+	// // Projectile
+	// p := Projectile{position: start, velocity: *velocity}
+	// e := Environment{gravity: gravity, wind: wind}
+	// finalProjection := ThrowProjectile(e, p, canvas)
+	// canvas.WriteToPPM("projectile.ppm")
+	// fmt.Printf("\nfinal projectile position: %v+\n", finalProjection.position)
+
+	m1 := NewMatrix(2, 3, [][]float64{
+		{1, 4}, {2, 5}, {3, 6},
+	})
+
+	m2 := NewMatrix(2, 2, [][]float64{
+		{7, 9}, {8, 10},
+	})
+
+	result := m1.Multiply(*m2)
+	fmt.Println(result)
+
 }

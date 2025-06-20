@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math"
 	"testing"
 )
@@ -312,4 +313,45 @@ func Test3x3Matrix(t *testing.T) {
 		t.Errorf("got: %f, want: %f", value, expectedValue)
 	}
 
+}
+
+func TestMatrixEquality(t *testing.T) {
+	m1 := NewMatrix(4, 4, [][]float64{{1, 5, 9, 5}, {2, 6, 8, 4}, {3, 7, 7, 3}, {4, 8, 6, 2}})
+	m2 := NewMatrix(4, 4, [][]float64{{1, 5, 9, 5}, {2, 6, 8, 4}, {3, 7, 7, 3}, {4, 8, 6, 2}})
+	if !m1.IsEqual(*m2) {
+		t.Errorf("expected matrices to be equal - but they are not")
+		m1.PrintMatrix()
+		fmt.Println("-----------")
+		m2.PrintMatrix()
+
+	}
+
+	m3 := NewMatrix(4, 4, [][]float64{{1, 5, 9, 5}, {2, 6, 8, 4}, {3, 7, 7, 3}, {4, 8, 6, 2}})
+	m4 := NewMatrix(4, 4, [][]float64{{2, 6, 8, 4}, {3, 7, 7, 3}, {1, 5, 9, 5}, {4, 8, 6, 2}})
+	if m3.IsEqual(*m4) {
+		t.Errorf("expected matrices to be not equal - but they are")
+		m3.PrintMatrix()
+		fmt.Println("-----------")
+		m4.PrintMatrix()
+
+	}
+
+}
+
+func TestMatrixMultiply_InvalidDimensions(t *testing.T) {
+	m1 := NewMatrix(2, 3, [][]float64{
+		{1, 2, 3},
+		{4, 5, 6},
+	})
+
+	m2 := NewMatrix(2, 2, [][]float64{
+		{7, 8},
+		{9, 10},
+	})
+
+	result := m1.Multiply(*m2)
+
+	if result.rows != 1 || result.columns != 1 || math.IsNaN(result.value[0][0]) == false {
+		t.Errorf("Expected NaNMatrix, but got %v", result.value)
+	}
 }

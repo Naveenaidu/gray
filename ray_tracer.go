@@ -316,8 +316,19 @@ type Matrix struct {
 	value   [][]float64
 }
 
-// Create a new matrix
-// each element of columns array define the columns of a matrix
+/*
+Create a new matrix. Each element of "columns" array define the columns of a
+matrix
+
+To Creates a matrix like below:
+
+	1.00   2.00   3.00   4.00
+	5.50   6.50   7.50   8.50
+	9.00  10.00  11.00  12.00
+	13.50  14.50  15.50  16.50
+
+matrix := NewMatrix(4, 4, [][]float64{{1, 5.5, 9, 13.5}, {2, 6.5, 10, 14.5}, {3, 7.5, 11, 15.5}, {4, 8.5, 12, 16.5}})
+*/
 func NewMatrix(num_rows int, num_cols int, columns [][]float64) *Matrix {
 	matrix := &Matrix{}
 	matrix.rows = num_rows
@@ -338,6 +349,22 @@ func NewMatrix(num_rows int, num_cols int, columns [][]float64) *Matrix {
 
 }
 
+func (m1 Matrix) IsEqual(m2 Matrix) bool {
+	if m1.rows != m2.rows || m1.columns != m2.columns {
+		return false
+	}
+
+	for r := 0; r < m1.rows; r++ {
+		for c := 0; c < m2.columns; c++ {
+			if !isFloatEqual(m1.value[r][c], m2.value[r][c]) {
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
 // PrintMatrix prints the matrix in a formatted way
 func (m *Matrix) PrintMatrix() {
 	for r := 0; r < m.rows; r++ {
@@ -346,4 +373,45 @@ func (m *Matrix) PrintMatrix() {
 		}
 		fmt.Println() // Move to the next row
 	}
+}
+
+// A 1x1 NAN matrix to depict malformed matrix operations
+func NaNMatrix() *Matrix {
+	return &Matrix{1, 1, [][]float64{{math.NaN()}}}
+}
+
+func (m1 Matrix) Multiply(m2 Matrix) *Matrix {
+	/*
+	   Two matrixs can only be multiplied, if the num of columns of first
+	   matrix is equal to the number of rows of the second matrix
+
+	   If matrix A is of size m x n and matrix B is of size n x p, then the
+	   matrix can only be multipled when n = p
+	*/
+	fmt.Println(m1.columns)
+	fmt.Println(m2.rows)
+	if m1.columns != m2.rows {
+		fmt.Printf("---- hello ---")
+		return NaNMatrix()
+	}
+
+	/*
+		If matrix A is of size m x n and matrix B is of size n x p, then the
+		resulting matrix AB will be of size m x p
+	*/
+	resultMatrix := NewMatrix(m1.rows, m2.columns, [][]float64{})
+
+	for r := 0; r < resultMatrix.rows; r++ {
+		for c := 0; c < resultMatrix.columns; c++ {
+			var sum float64
+			sum = 0
+			// Multiply the row of first matrix with the column of second matrix
+			for i := 0; i < m2.rows; i++ {
+				sum += m1.value[r][i] * m2.value[i][c]
+			}
+			resultMatrix.value[r][c] = sum
+		}
+	}
+
+	return resultMatrix
 }
