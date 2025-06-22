@@ -540,3 +540,24 @@ func (m Matrix) Determinant4() float64 {
 func (m Matrix) IsInvertible() bool {
 	return m.Determinant4() != 0
 }
+
+func (m Matrix) Inverse() *Matrix {
+	if !m.IsInvertible() {
+		return NaNMatrix()
+	}
+
+	det := m.Determinant4()
+	invertedMatrix := NewMatrix(m.rows, m.columns, [][]float64{})
+
+	for r := 0; r < m.rows; r++ {
+		for c := 0; c < m.columns; c++ {
+			cofactor := Cofactor4(m, r, c)
+			// note that "col, row" here, instead of "row, col",
+			// accomplishes the transpose operation!
+			invertedMatrix.value[c][r] = cofactor / det
+		}
+	}
+
+	return invertedMatrix
+
+}
