@@ -528,10 +528,15 @@ func Cofactor4(m Matrix, row int, col int) float64 {
 	return det
 }
 
-func Determinant4(m Matrix) float64 {
+// Since we focus only on 4x4 matrix, adding this as the function for the Matrix Struct
+func (m Matrix) Determinant4() float64 {
 	var det float64
 	for col := 0; col < m.columns; col++ {
 		det += m.value[0][col] * Cofactor4(m, 0, col)
 	}
 	return det
+}
+
+func (m Matrix) IsInvertible() bool {
+	return m.Determinant4() != 0
 }

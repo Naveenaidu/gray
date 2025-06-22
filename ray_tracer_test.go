@@ -624,9 +624,40 @@ func TestMatrix_4x4Determinant(t *testing.T) {
 	}
 
 	// Test determinant(A)
-	result = Determinant4(*matrix)
+	result = matrix.Determinant4()
 	expected = -4071.0
 	if !isFloatEqual(result, expected) {
 		t.Errorf("Expected determinant(A) = %v, but got %v", expected, result)
 	}
+}
+
+func TestMatrix_InvertibleMatrix(t *testing.T) {
+	// Scenario: Testing an invertible matrix for invertibility
+	// Det is -2120.0
+	matrix := NewMatrix(4, 4, [][]float64{
+		{6, 4, 4, 4},
+		{5, 5, 7, 6},
+		{4, -9, 3, -7},
+		{9, 1, 7, -6},
+	})
+
+	// Test invertibility
+	if !matrix.IsInvertible() {
+		t.Errorf("Expected matrix to be invertible, but it is not")
+	}
+
+	// Scenario: Testing a noninvertible matrix for invertibility
+	// Det is 0
+	matrix2 := NewMatrix(4, 4, [][]float64{
+		{-4, 2, -2, -3},
+		{9, 6, 2, 6},
+		{0, -5, 1, -5},
+		{0, 0, 0, 0},
+	})
+
+	// Test invertibility
+	if matrix2.IsInvertible() {
+		t.Errorf("Expected matrix to be noninvertible, but it is invertible")
+	}
+
 }
