@@ -437,3 +437,26 @@ func (m Matrix) MultiplyTuple(tuple [4]float64) *Matrix {
 	tupleMatrix := convertTupleToColumnMatrix(tuple)
 	return m.Multiply(*tupleMatrix)
 }
+
+// Identity Matrix is responsible to allow us to inverse matrices
+// Ref: https://www.reddit.com/r/learnmath/comments/on2s8z/taking_college_precal_what_are_the_point_of/
+// for reasons why we need them
+func IdentityMatrix() *Matrix {
+	// Note: We only worry about 4x4 matrix right now
+	return NewMatrix(4, 4, [][]float64{
+		{1, 0, 0, 0},
+		{0, 1, 0, 0},
+		{0, 0, 1, 0},
+		{0, 0, 0, 1},
+	})
+}
+
+func (m Matrix) Transpose() *Matrix {
+	transposedMatrix := NewMatrix(m.columns, m.rows, [][]float64{})
+	for r := 0; r < m.rows; r++ {
+		for c := 0; c < m.columns; c++ {
+			transposedMatrix.value[c][r] = m.value[r][c]
+		}
+	}
+	return transposedMatrix
+}

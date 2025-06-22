@@ -387,7 +387,7 @@ func TestMatrixMultiply(t *testing.T) {
 	}
 }
 
-func TestMatrixTupleMultiply(t *testing.T) {
+func TestMatrixMultiply_Tuple(t *testing.T) {
 	m1 := NewMatrix(4, 4, [][]float64{
 		{1, 2, 3, 4},
 		{2, 4, 4, 2},
@@ -411,5 +411,54 @@ func TestMatrixTupleMultiply(t *testing.T) {
 		fmt.Println("\ngot: ")
 		result.PrintMatrix()
 
+	}
+}
+
+func TestMatrixMultiply_IdentityMatrix(t *testing.T) {
+	m1 := NewMatrix(4, 4, [][]float64{
+		{1, 2, 3, 5},
+		{4, 5, 6, 0},
+		{7, 8, 9, 16},
+		{-2, 1, 4.4, 11},
+	})
+
+	expected := m1
+
+	result := m1.Multiply(*IdentityMatrix())
+
+	if !result.IsEqual(*expected) {
+		t.Errorf("Expected %v, but got %v", expected.value, result.value)
+	}
+}
+
+func TestMatrixMultiply_Transpose(t *testing.T) {
+	m1 := NewMatrix(4, 4, [][]float64{
+		{0, 9, 3, 0},
+		{9, 8, 0, 8},
+		{1, 8, 5, 3},
+		{0, 0, 5, 8},
+	})
+
+	expected := NewMatrix(4, 4, [][]float64{
+		{0, 9, 1, 0},
+		{9, 8, 8, 0},
+		{3, 0, 5, 5},
+		{0, 8, 3, 8},
+	})
+
+	result := m1.Transpose()
+
+	if !result.IsEqual(*expected) {
+		t.Errorf("Expected %v, but got %v", expected.value, result.value)
+	}
+}
+
+func TestMatrixMultiply_TransposeIdentity(t *testing.T) {
+	m1 := IdentityMatrix()
+
+	result := m1.Transpose()
+
+	if !result.IsEqual(*IdentityMatrix()) {
+		t.Errorf("Expected %v, but got %v", IdentityMatrix().value, result.value)
 	}
 }
