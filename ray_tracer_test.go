@@ -462,3 +462,55 @@ func TestMatrixMultiply_TransposeIdentity(t *testing.T) {
 		t.Errorf("Expected %v, but got %v", IdentityMatrix().value, result.value)
 	}
 }
+
+func TestMatrix_2x2Determinant(t *testing.T) {
+	m := NewMatrix(2, 2, [][]float64{
+		{1, 5},
+		{-3, 2},
+	})
+	result := Determinant2(*m)
+	expected := 17.0
+	if !isFloatEqual(result, expected) {
+		t.Errorf("Expected %v, but got %v", expected, result)
+	}
+}
+
+func TestMatrix_3x3SubMatrix(t *testing.T) {
+	m1 := NewMatrix(3, 3, [][]float64{
+		{1, 5, 0},
+		{-3, 2, 7},
+		{0, 6, -3},
+	})
+
+	expected := NewMatrix(2, 2, [][]float64{
+		{-3, 2},
+		{0, 6},
+	})
+
+	result := m1.SubMatrix(0, 2)
+
+	if !result.IsEqual(*expected) {
+		t.Errorf("Expected %v, but got %v", expected.value, result.value)
+	}
+}
+
+func TestMatrix_4x4SubMatrix(t *testing.T) {
+	m1 := NewMatrix(4, 4, [][]float64{
+		{1, 2, 3, 4},
+		{2, 4, -4, 2},
+		{8, 6, 4, 1},
+		{0, 10, 11, 1},
+	})
+
+	expected := NewMatrix(3, 3, [][]float64{
+		{1, 3, 4},
+		{2, -4, 2},
+		{0, 11, 1},
+	})
+
+	result := m1.SubMatrix(2, 1)
+
+	if !result.IsEqual(*expected) {
+		t.Errorf("Expected %v, but got %v", expected.value, result.value)
+	}
+}

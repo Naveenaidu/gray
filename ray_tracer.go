@@ -460,3 +460,33 @@ func (m Matrix) Transpose() *Matrix {
 	}
 	return transposedMatrix
 }
+
+// Calculate deteminant of 2x2 matrix
+func Determinant2(m Matrix) float64 {
+	d := m.value[0][0]*m.value[1][1] - m.value[0][1]*m.value[1][0]
+	return d
+}
+
+// Return back a new matrix by removing the row "row" and colum "col" from the
+// matrix
+func (m Matrix) SubMatrix(removeRow int, removeCol int) *Matrix {
+	subMatrix := NewMatrix(m.rows-1, m.columns-1, [][]float64{})
+	var subMatrixRow, subMatrixCol int
+
+	for r := 0; r < m.rows; r++ {
+		if r == removeRow {
+			continue
+		}
+		for c := 0; c < m.columns; c++ {
+			if c == removeCol {
+				continue
+			}
+			subMatrix.value[subMatrixRow][subMatrixCol] = m.value[r][c]
+			subMatrixCol += 1
+		}
+		subMatrixCol = 0
+		subMatrixRow += 1
+	}
+
+	return subMatrix
+}
