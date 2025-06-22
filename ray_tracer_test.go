@@ -521,7 +521,7 @@ func TestMatrix_3x3Minor(t *testing.T) {
 		{2, -1, -7},
 		{6, -1, 5},
 	})
-	result := m.Minor3(1, 0)
+	result := Minor3(*m, 1, 0)
 	expected := 25.0
 	if !isFloatEqual(result, expected) {
 		t.Errorf("Expected %v, but got %v", expected, result)
@@ -535,15 +535,98 @@ func TestMatrix_3x3Cofactor(t *testing.T) {
 		{2, -1, -7},
 		{6, -1, 5},
 	})
-	result = m.Cofactor3(0, 0)
+	result = Cofactor3(*m, 0, 0)
 	expected = -12.0
 	if !isFloatEqual(result, expected) {
 		t.Errorf("Expected %v, but got %v", expected, result)
 	}
 
-	result = m.Cofactor3(1, 0)
+	result = Cofactor3(*m, 1, 0)
 	expected = -25.0
 	if !isFloatEqual(result, expected) {
 		t.Errorf("Expected %v, but got %v", expected, result)
+	}
+}
+
+func TestMatrix_3x3Determinant(t *testing.T) {
+	// Given the following 3x3 matrix A
+	matrix := NewMatrix(3, 3, [][]float64{
+		{1, 2, 6},
+		{-5, 8, -4},
+		{2, 6, 4},
+	})
+
+	// Test cofactor(A, 0, 0)
+	result := Cofactor3(*matrix, 0, 0)
+	expected := 56.0
+	if !isFloatEqual(result, expected) {
+		t.Errorf("Expected cofactor(A, 0, 0) = %v, but got %v", expected, result)
+	}
+
+	// Test cofactor(A, 0, 1)
+	result = Cofactor3(*matrix, 0, 1)
+	expected = 12.0
+	if !isFloatEqual(result, expected) {
+		t.Errorf("Expected cofactor(A, 0, 1) = %v, but got %v", expected, result)
+	}
+
+	// Test cofactor(A, 0, 2)
+	result = Cofactor3(*matrix, 0, 2)
+	expected = -46.0
+	if !isFloatEqual(result, expected) {
+		t.Errorf("Expected cofactor(A, 0, 2) = %v, but got %v", expected, result)
+	}
+
+	// Test determinant(A)
+	result = Determinant3(*matrix)
+	expected = -196.0
+	if !isFloatEqual(result, expected) {
+		t.Errorf("Expected determinant(A) = %v, but got %v", expected, result)
+	}
+}
+
+func TestMatrix_4x4Determinant(t *testing.T) {
+	// Given the following 4x4 matrix A
+	matrix := NewMatrix(4, 4, [][]float64{
+		{-2, -8, 3, 5},
+		{-3, 1, 7, 3},
+		{1, 2, -9, 6},
+		{-6, 7, 7, -9},
+	})
+
+	// Test cofactor(A, 0, 0)
+	// subM1 := matrix.SubMatrix(0, 0)
+	result := Cofactor4(*matrix, 0, 0)
+	expected := 690.0
+	if !isFloatEqual(result, expected) {
+		t.Errorf("Expected cofactor(A, 0, 0) = %v, but got %v", expected, result)
+	}
+
+	// Test cofactor(A, 0, 1)
+	result = Cofactor4(*matrix, 0, 1)
+	expected = 447.0
+	if !isFloatEqual(result, expected) {
+		t.Errorf("Expected cofactor(A, 0, 1) = %v, but got %v", expected, result)
+	}
+
+	// Test cofactor(A, 0, 2)
+	result = Cofactor4(*matrix, 0, 2)
+	expected = 210.0
+	if !isFloatEqual(result, expected) {
+		t.Errorf("Expected cofactor(A, 0, 2) = %v, but got %v", expected, result)
+	}
+
+	// Test cofactor(A, 0, 3)
+	result = Cofactor4(*matrix, 0, 3)
+	expected = 51.0
+	if !isFloatEqual(result, expected) {
+		t.Errorf("Expected cofactor(A, 0, 3) = %v, but got %v", expected, result)
+	}
+
+	// Test determinant(A)
+	result = Determinant4(*matrix)
+	expected = -4071.0
+	if !isFloatEqual(result, expected) {
+		t.Errorf("Expected determinant(A) = %v, but got %v", expected, result)
 	}
 }

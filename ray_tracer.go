@@ -494,14 +494,14 @@ func (m Matrix) SubMatrix(removeRow int, removeCol int) *Matrix {
 // Minor for a 3x3 Matrix
 // The minor of an element at row i and column j is the determinant of the sub-
 // matrix at (i,j)
-func (m Matrix) Minor3(row int, col int) float64 {
+func Minor3(m Matrix, row int, col int) float64 {
 	m_sub := m.SubMatrix(row, col)
 	return Determinant2(*m_sub)
 }
 
 // Minors that have (possibly) had their sign changed
-func (m Matrix) Cofactor3(row int, col int) float64 {
-	minor := m.Minor3(row, col)
+func Cofactor3(m Matrix, row int, col int) float64 {
+	minor := Minor3(m, row, col)
 
 	// If row + column is an odd number, then you negate the minor
 	if (row+col)%2 != 0 {
@@ -509,4 +509,29 @@ func (m Matrix) Cofactor3(row int, col int) float64 {
 	}
 	return minor
 
+}
+
+func Determinant3(m Matrix) float64 {
+	var det float64
+	for col := 0; col < m.columns; col++ {
+		det += m.value[0][col] * Cofactor3(m, 0, col)
+	}
+	return det
+}
+
+func Cofactor4(m Matrix, row int, col int) float64 {
+	subM := m.SubMatrix(row, col)
+	det := Determinant3(*subM)
+	if (row+col)%2 != 0 {
+		return det * -1.0
+	}
+	return det
+}
+
+func Determinant4(m Matrix) float64 {
+	var det float64
+	for col := 0; col < m.columns; col++ {
+		det += m.value[0][col] * Cofactor4(m, 0, col)
+	}
+	return det
 }
