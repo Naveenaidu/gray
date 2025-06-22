@@ -514,3 +514,16 @@ func TestMatrix_4x4SubMatrix(t *testing.T) {
 		t.Errorf("Expected %v, but got %v", expected.value, result.value)
 	}
 }
+
+func TestMatrix_3x3Minor(t *testing.T) {
+	m := NewMatrix(3, 3, [][]float64{
+		{3, 5, 0},
+		{2, -1, -7},
+		{6, -1, 5},
+	})
+	result := m.Minor3(1, 0)
+	expected := 25.0
+	if !isFloatEqual(result, expected) {
+		t.Errorf("Expected %v, but got %v", expected, result)
+	}
+}

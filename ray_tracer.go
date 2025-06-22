@@ -490,3 +490,11 @@ func (m Matrix) SubMatrix(removeRow int, removeCol int) *Matrix {
 
 	return subMatrix
 }
+
+// Minor for a 3x3 Matrix
+// The minor of an element at row i and column j is the determinant of the sub-
+// matrix at (i,j)
+func (m Matrix) Minor3(row int, col int) float64 {
+	m_sub := m.SubMatrix(row, col)
+	return Determinant2(*m_sub)
+}
