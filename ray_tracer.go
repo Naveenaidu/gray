@@ -317,7 +317,7 @@ type Matrix struct {
 }
 
 /*
-Create a new matrix. Each element of "columns" array define the columns of a
+Create a new matrix. Each element of "row" array defines the rows of a
 matrix
 
 To Creates a matrix like below:
@@ -326,22 +326,30 @@ To Creates a matrix like below:
 	5.50   6.50   7.50   8.50
 	9.00  10.00  11.00  12.00
 	13.50  14.50  15.50  16.50
-
-matrix := NewMatrix(4, 4, [][]float64{{1, 5.5, 9, 13.5}, {2, 6.5, 10, 14.5}, {3, 7.5, 11, 15.5}, {4, 8.5, 12, 16.5}})
 */
-func NewMatrix(num_rows int, num_cols int, columns [][]float64) *Matrix {
+func NewMatrix(num_rows int, num_cols int, rows [][]float64) *Matrix {
 	matrix := &Matrix{}
 	matrix.rows = num_rows
 	matrix.columns = num_cols
+	var matrixValues [][]float64
 
 	matrix.value = make([][]float64, matrix.rows)
 	for r := range matrix.value {
 		matrix.value[r] = make([]float64, matrix.columns)
 	}
 
-	for c := 0; c < matrix.columns; c++ {
-		for r := 0; r < matrix.rows; r++ {
-			matrix.value[c][r] = columns[r][c]
+	// initialize all matrix values to be zero, if no values are provided
+	if len(rows) == 0 {
+		matrixValues = make([][]float64, matrix.rows)
+		for r := range matrixValues {
+			matrixValues[r] = make([]float64, matrix.columns)
+		}
+		rows = matrixValues
+	}
+
+	for r := 0; r < matrix.rows; r++ {
+		for c := 0; c < matrix.columns; c++ {
+			matrix.value[r][c] = rows[r][c]
 		}
 	}
 
@@ -388,10 +396,7 @@ func (m1 Matrix) Multiply(m2 Matrix) *Matrix {
 	   If matrix A is of size m x n and matrix B is of size n x p, then the
 	   matrix can only be multipled when n = p
 	*/
-	fmt.Println(m1.columns)
-	fmt.Println(m2.rows)
 	if m1.columns != m2.rows {
-		fmt.Printf("---- hello ---")
 		return NaNMatrix()
 	}
 
@@ -414,4 +419,21 @@ func (m1 Matrix) Multiply(m2 Matrix) *Matrix {
 	}
 
 	return resultMatrix
+}
+
+// Convert a tuple to a single column matrix
+// TODO: generalize this, for now we only care about 4x1 matrix
+func convertTupleToColumnMatrix(arr [4]float64) *Matrix {
+	m := NewMatrix(4, 1, [][]float64{})
+
+	for r := 0; r < len(arr); r++ {
+		m.value[r][0] = arr[r]
+	}
+
+	return m
+}
+
+func (m Matrix) MultiplyTuple(tuple [4]float64) *Matrix {
+	tupleMatrix := convertTupleToColumnMatrix(tuple)
+	return m.Multiply(*tupleMatrix)
 }

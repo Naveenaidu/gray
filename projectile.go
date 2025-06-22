@@ -65,15 +65,21 @@ func main() {
 	// canvas.WriteToPPM("projectile.ppm")
 	// fmt.Printf("\nfinal projectile position: %v+\n", finalProjection.position)
 
-	m1 := NewMatrix(2, 3, [][]float64{
-		{1, 4}, {2, 5}, {3, 6},
+	m1 := NewMatrix(4, 4, [][]float64{
+		{1, 2, 3, 4},
+		{5, 6, 7, 8},
+		{9, 8, 7, 6},
+		{5, 4, 3, 2},
 	})
 
-	m2 := NewMatrix(2, 2, [][]float64{
-		{7, 9}, {8, 10},
+	m2 := NewMatrix(4, 4, [][]float64{
+		{-2, 1, 2, 3},
+		{3, 2, 1, -1},
+		{4, 3, 4, 5},
+		{1, 2, 7, 8},
 	})
 
 	result := m1.Multiply(*m2)
-	fmt.Println(result)
+	result.PrintMatrix()
 
 }

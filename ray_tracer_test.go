@@ -229,8 +229,7 @@ func TestNewMatrix(t *testing.T) {
 
 		Note that the columns are sent as arrays
 	*/
-	matrix := NewMatrix(4, 4, [][]float64{{1, 5.5, 9, 13.5}, {2, 6.5, 10, 14.5}, {3, 7.5, 11, 15.5}, {4, 8.5, 12, 16.5}})
-	matrix.PrintMatrix()
+	matrix := NewMatrix(4, 4, [][]float64{{1, 2, 3, 4}, {5.5, 6.5, 7.5, 8.5}, {9, 10, 11, 12}, {13.5, 14.5, 15.5, 16.5}})
 
 	if matrix.value[0][0] != 1 {
 		t.Errorf("got: %f, want: %f", matrix.value[0][0], 1.0)
@@ -262,8 +261,7 @@ func TestNewMatrix(t *testing.T) {
 }
 
 func Test2x2Matrix(t *testing.T) {
-	matrix := NewMatrix(2, 2, [][]float64{{-3, 1}, {5, -2}})
-	matrix.PrintMatrix()
+	matrix := NewMatrix(2, 2, [][]float64{{-3, 5}, {1, -2}})
 
 	value := matrix.value[0][0]
 	expectedValue := -3.0
@@ -292,8 +290,7 @@ func Test2x2Matrix(t *testing.T) {
 }
 
 func Test3x3Matrix(t *testing.T) {
-	matrix := NewMatrix(3, 3, [][]float64{{-3, 1, 0}, {5, -2, 1}, {0, -7, 1}})
-	matrix.PrintMatrix()
+	matrix := NewMatrix(3, 3, [][]float64{{-3, 5, 0}, {1, -2, -7}, {0, 1, 1}})
 
 	value := matrix.value[0][0]
 	expectedValue := -3.0
@@ -353,5 +350,66 @@ func TestMatrixMultiply_InvalidDimensions(t *testing.T) {
 
 	if result.rows != 1 || result.columns != 1 || math.IsNaN(result.value[0][0]) == false {
 		t.Errorf("Expected NaNMatrix, but got %v", result.value)
+	}
+}
+
+func TestMatrixMultiply(t *testing.T) {
+	m1 := NewMatrix(4, 4, [][]float64{
+		{1, 2, 3, 4},
+		{5, 6, 7, 8},
+		{9, 8, 7, 6},
+		{5, 4, 3, 2},
+	})
+
+	m2 := NewMatrix(4, 4, [][]float64{
+		{-2, 1, 2, 3},
+		{3, 2, 1, -1},
+		{4, 3, 6, 5},
+		{1, 2, 7, 8},
+	})
+
+	result := m1.Multiply(*m2)
+
+	expectedMatrix := NewMatrix(4, 4, [][]float64{
+		{20, 22, 50, 48},
+		{44, 54, 114, 108},
+		{40, 58, 110, 102},
+		{16, 26, 46, 42},
+	})
+
+	if !result.IsEqual(*expectedMatrix) {
+		t.Errorf("Multiplication result does not mathch: ")
+		fmt.Println("expected: ")
+		expectedMatrix.PrintMatrix()
+		fmt.Println("\ngot: ")
+		result.PrintMatrix()
+
+	}
+}
+
+func TestMatrixTupleMultiply(t *testing.T) {
+	m1 := NewMatrix(4, 4, [][]float64{
+		{1, 2, 3, 4},
+		{2, 4, 4, 2},
+		{8, 6, 4, 1},
+		{0, 0, 0, 1},
+	})
+
+	result := m1.MultiplyTuple([4]float64{1, 2, 3, 1})
+
+	expectedMatrix := NewMatrix(4, 1, [][]float64{
+		{18},
+		{24},
+		{33},
+		{1},
+	})
+
+	if !result.IsEqual(*expectedMatrix) {
+		t.Errorf("Multiplication result does not mathch: ")
+		fmt.Println("expected: ")
+		expectedMatrix.PrintMatrix()
+		fmt.Println("\ngot: ")
+		result.PrintMatrix()
+
 	}
 }
