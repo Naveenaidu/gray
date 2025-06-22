@@ -527,3 +527,23 @@ func TestMatrix_3x3Minor(t *testing.T) {
 		t.Errorf("Expected %v, but got %v", expected, result)
 	}
 }
+
+func TestMatrix_3x3Cofactor(t *testing.T) {
+	var result, expected float64
+	m := NewMatrix(3, 3, [][]float64{
+		{3, 5, 0},
+		{2, -1, -7},
+		{6, -1, 5},
+	})
+	result = m.Cofactor3(0, 0)
+	expected = -12.0
+	if !isFloatEqual(result, expected) {
+		t.Errorf("Expected %v, but got %v", expected, result)
+	}
+
+	result = m.Cofactor3(1, 0)
+	expected = -25.0
+	if !isFloatEqual(result, expected) {
+		t.Errorf("Expected %v, but got %v", expected, result)
+	}
+}

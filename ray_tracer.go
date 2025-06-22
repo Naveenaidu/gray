@@ -498,3 +498,15 @@ func (m Matrix) Minor3(row int, col int) float64 {
 	m_sub := m.SubMatrix(row, col)
 	return Determinant2(*m_sub)
 }
+
+// Minors that have (possibly) had their sign changed
+func (m Matrix) Cofactor3(row int, col int) float64 {
+	minor := m.Minor3(row, col)
+
+	// If row + column is an odd number, then you negate the minor
+	if (row+col)%2 != 0 {
+		return minor * -1.0
+	}
+	return minor
+
+}
