@@ -742,3 +742,20 @@ func TestMatrix_ProductWithInverse(t *testing.T) {
 		t.Errorf("Expected C * inverse(B) = A, but got %v", result.value)
 	}
 }
+
+/* ------------- Transformations --------------- */
+func TestTranslatePoint(t *testing.T) {
+	p := NewPoint(-3, 4, 5)
+	result := p.Translate(5, -3, 2)
+	if !result.IsEqual(*NewPoint(2, 1, 7)) {
+		t.Errorf("got: %+v, want: (2, 1, 7)", result)
+	}
+
+	p1 := NewPoint(-3, 4, 5)
+	tM := TranslationM(5, -3, 2).Inverse()
+	result1 := tM.Multiply(*p1.ToMatrix()).ToPoint()
+	if !result1.IsEqual(*NewPoint(-8, 7, 3)) {
+		t.Errorf("got: %+v, want: (-8, 7, 3)", result)
+	}
+
+}

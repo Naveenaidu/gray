@@ -51,6 +51,20 @@ func (p1 Point) ScalarDivide(scalar float64) *Point {
 	return &Point{p1.x / scalar, p1.y / scalar, p1.z / scalar}
 }
 
+// Represent point as 4x1 matrix.
+// An extra row is added for easier calculation, points have the 4th row as 1
+func (p1 Point) ToMatrix() *Matrix {
+	return NewMatrix(4, 1, [][]float64{{p1.x}, {p1.y}, {p1.z}, {1.0}})
+}
+
+// Translate a point
+func (p1 Point) Translate(x float64, y float64, z float64) *Point {
+	translationM := TranslationM(x, y, z)
+	pointM := p1.ToMatrix()
+	translatedPointM := translationM.Multiply(*pointM)
+	return translatedPointM.ToPoint()
+}
+
 /* ------------- Vector --------------- */
 type Vector struct {
 	x, y, z float64
@@ -136,6 +150,12 @@ func (v1 Vector) CrossProduct(v2 Vector) *Vector {
 	crossProduct_z := v1.x*v2.y - v1.y*v2.x
 
 	return &Vector{crossProduct_x, crossProduct_y, crossProduct_z}
+}
+
+// Represent vector as 4x1 matrix.
+// An extra row is added for easier calculation, vector have the 4th row as 1
+func (v1 Vector) ToMatrix() *Matrix {
+	return NewMatrix(4, 1, [][]float64{{v1.x}, {v1.y}, {v1.z}, {0.0}})
 }
 
 /* ------------- Colors --------------- */
@@ -388,6 +408,16 @@ func NaNMatrix() *Matrix {
 	return &Matrix{1, 1, [][]float64{{math.NaN()}}}
 }
 
+// Note: During transformations points are converted to 4x1 matrix
+func (m1 Matrix) ToPoint() *Point {
+	return NewPoint(m1.value[0][0], m1.value[1][0], m1.value[2][0])
+}
+
+// Note: During transformations vector are converted to 4x1 matrix
+func (m1 Matrix) ToVector() *Vector {
+	return NewVector(m1.value[0][0], m1.value[1][0], m1.value[2][0])
+}
+
 func (m1 Matrix) Multiply(m2 Matrix) *Matrix {
 	/*
 	   Two matrixs can only be multiplied, if the num of columns of first
@@ -422,7 +452,7 @@ func (m1 Matrix) Multiply(m2 Matrix) *Matrix {
 }
 
 // Convert a tuple to a single column matrix
-// TODO: generalize this, for now we only care about 4x1 matrix
+// TODO: This can be removed since we now have ToPoint() and ToVector()
 func convertTupleToColumnMatrix(arr [4]float64) *Matrix {
 	m := NewMatrix(4, 1, [][]float64{})
 
@@ -560,4 +590,40 @@ func (m Matrix) Inverse() *Matrix {
 
 	return invertedMatrix
 
+}
+
+/* ------------- Matrix Transformations --------------- */
+
+/*
+Create a translation matrix. Example matrix:
+
+	1.00   0.00   0.00   X
+	0.00   1.00   0.00   Y
+	0.00   0.00   1.00   Z
+	0.00   0.00   0.00   1.00
+
+Points and vectors are represented as single colum matrix, something like:
+
+	PX.00
+	PY.00
+	PZ.00
+	1.00
+
+Muliplying translation matrix with point matrix gives: P' = T * P, resembles
+the below operation:
+
+	PX' = X' + PX
+	PY' = Y' + PY
+	PZ' = Z' + PZ
+
+Note: Translations to vector are not supported. Vector is an arrow, moving it
+around space does not change the direction it points to
+*/
+func TranslationM(x float64, y float64, z float64) *Matrix {
+	return NewMatrix(4, 4, [][]float64{
+		{1, 0, 0, x},
+		{0, 1, 0, y},
+		{0, 0, 1, z},
+		{0, 0, 0, 1},
+	})
 }
