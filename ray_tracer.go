@@ -663,3 +663,30 @@ func ScalingM(x float64, y float64, z float64) *Matrix {
 		{0, 0, 0, 1},
 	})
 }
+
+func RotateXM(r float64) *Matrix {
+	return NewMatrix(4, 4, [][]float64{
+		{1, 0, 0, 0},
+		{0, math.Cos(r), (-1 * math.Sin(r)), 0},
+		{0, math.Sin(r), math.Cos(r), 0},
+		{0, 0, 0, 1},
+	})
+}
+
+func RotateYM(r float64) *Matrix {
+	return NewMatrix(4, 4, [][]float64{
+		{math.Cos(r), 0, math.Sin(r), 0},
+		{0, 1, 0, 0},
+		{(-1 * math.Sin(r)), 0, math.Cos(r), 0},
+		{0, 0, 0, 1},
+	})
+}
+
+func RotateZM(r float64) *Matrix {
+	return NewMatrix(4, 4, [][]float64{
+		{math.Cos(r), (-1 * math.Sin(r)), 0, 0},
+		{math.Sin(r), math.Cos(r), 0, 0},
+		{0, 0, 1, 0},
+		{0, 0, 0, 1},
+	})
+}

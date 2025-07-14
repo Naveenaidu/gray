@@ -823,3 +823,103 @@ func TestReflectionIsScalingByNegativeValue(t *testing.T) {
 		t.Errorf("Expected scaling result = %v, but got %v", expected, result)
 	}
 }
+
+func TestRotatingPointAroundXAxis(t *testing.T) {
+	// Given p ← point(0, 1, 0)
+	p := NewPoint(0, 1, 0)
+
+	// And half_quarter ← rotation_x(π / 4)
+	halfQuarter := RotateXM(math.Pi / 4)
+
+	// And full_quarter ← rotation_x(π / 2)
+	fullQuarter := RotateXM(math.Pi / 2)
+
+	// Then half_quarter * p = point(0, √2/2, √2/2)
+	resultHalfQuarter := halfQuarter.Multiply(*p.ToMatrix()).ToPoint()
+	expectedHalfQuarter := NewPoint(0, math.Sqrt(2)/2, math.Sqrt(2)/2)
+
+	if !resultHalfQuarter.IsEqual(*expectedHalfQuarter) {
+		t.Errorf("Expected half_quarter * p = %v, but got %v", expectedHalfQuarter, resultHalfQuarter)
+	}
+
+	// And full_quarter * p = point(0, 0, 1)
+	resultFullQuarter := fullQuarter.Multiply(*p.ToMatrix()).ToPoint()
+	expectedFullQuarter := NewPoint(0, 0, 1)
+
+	if !resultFullQuarter.IsEqual(*expectedFullQuarter) {
+		t.Errorf("Expected full_quarter * p = %v, but got %v", expectedFullQuarter, resultFullQuarter)
+	}
+}
+
+func TestInverseOfXRotationRotatesOppositeDirection(t *testing.T) {
+	// Given p ← point(0, 1, 0)
+	p := NewPoint(0, 1, 0)
+
+	// And half_quarter ← rotation_x(π / 4)
+	halfQuarter := RotateXM(math.Pi / 4)
+
+	// And inv ← inverse(half_quarter)
+	inv := halfQuarter.Inverse()
+
+	// Then inv * p = point(0, √2/2, -√2/2)
+	result := inv.Multiply(*p.ToMatrix()).ToPoint()
+	expected := NewPoint(0, math.Sqrt(2)/2, -math.Sqrt(2)/2)
+
+	if !result.IsEqual(*expected) {
+		t.Errorf("Expected inv * p = %v, but got %v", expected, result)
+	}
+}
+
+func TestRotatingPointAroundYAxis(t *testing.T) {
+	// Given p ← point(0, 0, 1)
+	p := NewPoint(0, 0, 1)
+
+	// And half_quarter ← rotation_y(π / 4)
+	halfQuarter := RotateYM(math.Pi / 4)
+
+	// And full_quarter ← rotation_y(π / 2)
+	fullQuarter := RotateYM(math.Pi / 2)
+
+	// Then half_quarter * p = point(√2/2, 0, √2/2)
+	resultHalfQuarter := halfQuarter.Multiply(*p.ToMatrix()).ToPoint()
+	expectedHalfQuarter := NewPoint(math.Sqrt(2)/2, 0, math.Sqrt(2)/2)
+
+	if !resultHalfQuarter.IsEqual(*expectedHalfQuarter) {
+		t.Errorf("Expected half_quarter * p = %v, but got %v", expectedHalfQuarter, resultHalfQuarter)
+	}
+
+	// And full_quarter * p = point(1, 0, 0)
+	resultFullQuarter := fullQuarter.Multiply(*p.ToMatrix()).ToPoint()
+	expectedFullQuarter := NewPoint(1, 0, 0)
+
+	if !resultFullQuarter.IsEqual(*expectedFullQuarter) {
+		t.Errorf("Expected full_quarter * p = %v, but got %v", expectedFullQuarter, resultFullQuarter)
+	}
+}
+
+func TestRotatingPointAroundZAxis(t *testing.T) {
+	// Given p ← point(0, 1, 0)
+	p := NewPoint(0, 1, 0)
+
+	// And half_quarter ← rotation_z(π / 4)
+	halfQuarter := RotateZM(math.Pi / 4)
+
+	// And full_quarter ← rotation_z(π / 2)
+	fullQuarter := RotateZM(math.Pi / 2)
+
+	// Then half_quarter * p = point(-√2/2, √2/2, 0)
+	resultHalfQuarter := halfQuarter.Multiply(*p.ToMatrix()).ToPoint()
+	expectedHalfQuarter := NewPoint(-math.Sqrt(2)/2, math.Sqrt(2)/2, 0)
+
+	if !resultHalfQuarter.IsEqual(*expectedHalfQuarter) {
+		t.Errorf("Expected half_quarter * p = %v, but got %v", expectedHalfQuarter, resultHalfQuarter)
+	}
+
+	// And full_quarter * p = point(-1, 0, 0)
+	resultFullQuarter := fullQuarter.Multiply(*p.ToMatrix()).ToPoint()
+	expectedFullQuarter := NewPoint(-1, 0, 0)
+
+	if !resultFullQuarter.IsEqual(*expectedFullQuarter) {
+		t.Errorf("Expected full_quarter * p = %v, but got %v", expectedFullQuarter, resultFullQuarter)
+	}
+}
