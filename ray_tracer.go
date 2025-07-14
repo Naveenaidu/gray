@@ -65,6 +65,14 @@ func (p1 Point) Translate(x float64, y float64, z float64) *Point {
 	return translatedPointM.ToPoint()
 }
 
+// Scale a point
+func (p1 Point) Scale(x float64, y float64, z float64) *Point {
+	scaleM := ScalingM(x, y, z)
+	pointM := p1.ToMatrix()
+	scaledPointM := scaleM.Multiply(*pointM)
+	return scaledPointM.ToPoint()
+}
+
 /* ------------- Vector --------------- */
 type Vector struct {
 	x, y, z float64
@@ -156,6 +164,14 @@ func (v1 Vector) CrossProduct(v2 Vector) *Vector {
 // An extra row is added for easier calculation, vector have the 4th row as 1
 func (v1 Vector) ToMatrix() *Matrix {
 	return NewMatrix(4, 1, [][]float64{{v1.x}, {v1.y}, {v1.z}, {0.0}})
+}
+
+// Scale a Vector
+func (v1 Vector) Scale(x float64, y float64, z float64) *Vector {
+	scaleM := ScalingM(x, y, z)
+	vectorM := v1.ToMatrix()
+	scaledVectorM := scaleM.Multiply(*vectorM)
+	return scaledVectorM.ToVector()
 }
 
 /* ------------- Colors --------------- */
@@ -624,6 +640,26 @@ func TranslationM(x float64, y float64, z float64) *Matrix {
 		{1, 0, 0, x},
 		{0, 1, 0, y},
 		{0, 0, 1, z},
+		{0, 0, 0, 1},
+	})
+}
+
+/*
+Scaling Matrix:
+
+# Translation moves a point by adding to it, scaling moves it by multiplication
+
+Muliplying scaling matrix with point/vector matrix gives: P' = T * P, resembles
+
+	PX' = X' * PX
+	PY' = Y' * PY
+	PZ' = Z' * PZ
+*/
+func ScalingM(x float64, y float64, z float64) *Matrix {
+	return NewMatrix(4, 4, [][]float64{
+		{x, 0, 0, 0},
+		{0, y, 0, 0},
+		{0, 0, z, 0},
 		{0, 0, 0, 1},
 	})
 }

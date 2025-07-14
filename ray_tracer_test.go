@@ -759,3 +759,67 @@ func TestTranslatePoint(t *testing.T) {
 	}
 
 }
+
+func TestScalingMatrixAppliedToPoint(t *testing.T) {
+	// Given p ← point(-4, 6, 8)
+	p := NewPoint(-4, 6, 8)
+
+	// When scaling is applied with factors (2, 3, 4)
+	result := p.Scale(2, 3, 4)
+
+	// Then the result should be point(-8, 18, 32)
+	expected := NewPoint(-8, 18, 32)
+
+	if !result.IsEqual(*expected) {
+		t.Errorf("Expected scaling result = %v, but got %v", expected, result)
+	}
+}
+
+func TestScalingMatrixAppliedToVector(t *testing.T) {
+	// Given v ← vector(-4, 6, 8)
+	v := NewVector(-4, 6, 8)
+
+	// When scaling is applied with factors (2, 3, 4)
+	result := v.Scale(2, 3, 4)
+
+	// Then the result should be vector(-8, 18, 32)
+	expected := NewVector(-8, 18, 32)
+
+	if !result.IsEqual(*expected) {
+		t.Errorf("Expected scaling result = %v, but got %v", expected, result)
+	}
+}
+
+func TestMultiplyingByInverseOfScalingMatrix(t *testing.T) {
+	// Given transform ← scaling(2, 3, 4)
+	transform := ScalingM(2, 3, 4)
+
+	// And inv ← inverse(transform)
+	inv := transform.Inverse()
+
+	// And v ← vector(-4, 6, 8)
+	v := NewVector(-4, 6, 8)
+
+	// Then inv * v = vector(-2, 2, 2)
+	result := inv.Multiply(*v.ToMatrix()).ToVector()
+	expected := NewVector(-2, 2, 2)
+
+	if !result.IsEqual(*expected) {
+		t.Errorf("Expected inv * v = %v, but got %v", expected, result)
+	}
+}
+
+func TestReflectionIsScalingByNegativeValue(t *testing.T) {
+	// Given p ← point(2, 3, 4)
+	p := NewPoint(2, 3, 4)
+
+	// When scaling is applied with factors (-1, 1, 1)
+	result := p.Scale(-1, 1, 1)
+
+	// Then the result should be point (-2, 3, 4), point is reflected on x axis
+	expected := NewPoint(-2, 3, 4)
+
+	if !result.IsEqual(*expected) {
+		t.Errorf("Expected scaling result = %v, but got %v", expected, result)
+	}
+}
