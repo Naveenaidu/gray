@@ -73,6 +73,13 @@ func (p1 Point) Scale(x float64, y float64, z float64) *Point {
 	return scaledPointM.ToPoint()
 }
 
+func (p1 Point) Shear(xy float64, xz float64, yx float64, yz float64, zx float64, zy float64) *Point {
+	shearM := ShearM(xy, xz, yx, yz, zx, zy)
+	pointM := p1.ToMatrix()
+	shearedPointM := shearM.Multiply(*pointM)
+	return shearedPointM.ToPoint()
+}
+
 /* ------------- Vector --------------- */
 type Vector struct {
 	x, y, z float64
@@ -687,6 +694,15 @@ func RotateZM(r float64) *Matrix {
 		{math.Cos(r), (-1 * math.Sin(r)), 0, 0},
 		{math.Sin(r), math.Cos(r), 0, 0},
 		{0, 0, 1, 0},
+		{0, 0, 0, 1},
+	})
+}
+
+func ShearM(xy float64, xz float64, yx float64, yz float64, zx float64, zy float64) *Matrix {
+	return NewMatrix(4, 4, [][]float64{
+		{1, xy, xz, 0},
+		{yx, 1, yz, 0},
+		{zx, zy, 1, 0},
 		{0, 0, 0, 1},
 	})
 }

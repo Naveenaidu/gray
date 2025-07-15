@@ -923,3 +923,60 @@ func TestRotatingPointAroundZAxis(t *testing.T) {
 		t.Errorf("Expected full_quarter * p = %v, but got %v", expectedFullQuarter, resultFullQuarter)
 	}
 }
+
+func TestShearingTransformation(t *testing.T) {
+	// Scenario: A shearing transformation moves x in proportion to z
+	// Given transform ← shearing(0, 1, 0, 0, 0, 0)
+	// And p ← point(2, 3, 4)
+	p := NewPoint(2, 3, 4)
+	result := p.Shear(0, 1, 0, 0, 0, 0)
+	expected := NewPoint(6, 3, 4)
+
+	if !result.IsEqual(*expected) {
+		t.Errorf("Expected transform * p = %v, but got %v", expected, result)
+	}
+
+	// Scenario: A shearing transformation moves y in proportion to x
+	// Given transform ← shearing(0, 0, 1, 0, 0, 0)
+	// And p ← point(2, 3, 4)
+	p = NewPoint(2, 3, 4)
+	result = p.Shear(0, 0, 1, 0, 0, 0)
+	expected = NewPoint(2, 5, 4)
+
+	if !result.IsEqual(*expected) {
+		t.Errorf("Expected transform * p = %v, but got %v", expected, result)
+	}
+
+	// Scenario: A shearing transformation moves y in proportion to z
+	// Given transform ← shearing(0, 0, 0, 1, 0, 0)
+	// And p ← point(2, 3, 4)
+	p = NewPoint(2, 3, 4)
+	result = p.Shear(0, 0, 0, 1, 0, 0)
+	expected = NewPoint(2, 7, 4)
+
+	if !result.IsEqual(*expected) {
+		t.Errorf("Expected transform * p = %v, but got %v", expected, result)
+	}
+
+	// Scenario: A shearing transformation moves z in proportion to x
+	// Given transform ← shearing(0, 0, 0, 0, 1, 0)
+	// And p ← point(2, 3, 4)
+	p = NewPoint(2, 3, 4)
+	result = p.Shear(0, 0, 0, 0, 1, 0)
+	expected = NewPoint(2, 3, 6)
+
+	if !result.IsEqual(*expected) {
+		t.Errorf("Expected transform * p = %v, but got %v", expected, result)
+	}
+
+	// Scenario: A shearing transformation moves z in proportion to y
+	// Given transform ← shearing(0, 0, 0, 0, 0, 1)
+	// And p ← point(2, 3, 4)
+	p = NewPoint(2, 3, 4)
+	result = p.Shear(0, 0, 0, 0, 0, 1)
+	expected = NewPoint(2, 3, 7)
+
+	if !result.IsEqual(*expected) {
+		t.Errorf("Expected transform * p = %v, but got %v", expected, result)
+	}
+}
