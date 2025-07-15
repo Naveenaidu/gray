@@ -792,7 +792,7 @@ func TestScalingMatrixAppliedToVector(t *testing.T) {
 
 func TestMultiplyingByInverseOfScalingMatrix(t *testing.T) {
 	// Given transform ← scaling(2, 3, 4)
-	transform := ScalingM(2, 3, 4)
+	transform := ScaleM(2, 3, 4)
 
 	// And inv ← inverse(transform)
 	inv := transform.Inverse()
