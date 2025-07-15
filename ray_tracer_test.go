@@ -980,3 +980,45 @@ func TestShearingTransformation(t *testing.T) {
 		t.Errorf("Expected transform * p = %v, but got %v", expected, result)
 	}
 }
+
+func TestChainingTransformations(t *testing.T) {
+	//Scenario: Individual transformations are applied in sequence
+	p := NewPoint(1, 0, 1)
+	pM := p.ToMatrix()
+	rotateXM := RotateXM(math.Pi / 2)
+	scaleM := ScaleM(5, 5, 5)
+	translationM := TranslationM(10, 5, 7)
+
+	// apply rotation first
+	pRotateM := rotateXM.Multiply(*pM)
+	pRotate := pRotateM.ToPoint()
+	expected := NewPoint(1, -1, 0)
+	if !pRotate.IsEqual(*expected) {
+		t.Errorf("Expected transform * p = %v, but got %v", expected, pRotate)
+	}
+
+	// then apply scaling
+	pRotateAndScaleM := scaleM.Multiply(*pRotateM)
+	pRotateAndScale := pRotateAndScaleM.ToPoint()
+	expected = NewPoint(5, -5, 0)
+	if !pRotateAndScale.IsEqual(*expected) {
+		t.Errorf("Expected transform * p = %v, but got %v", expected, pRotateAndScale)
+	}
+
+	// then apply translation
+	pRotateAndScaleAndTranslateM := translationM.Multiply(*pRotateAndScaleM)
+	pRotateAndScaleAndTranslate := pRotateAndScaleAndTranslateM.ToPoint()
+	expected = NewPoint(15, 0, 7)
+	if !pRotateAndScaleAndTranslate.IsEqual(*expected) {
+		t.Errorf("Expected transform * p = %v, but got %v", expected, pRotateAndScaleAndTranslate)
+	}
+
+	// Scenario: Chained transformations must be applied in reverse order
+	pRotateAndScaleAndTranslateChainedM := translationM.Multiply(*scaleM).Multiply(*rotateXM).Multiply(*pM)
+	pRotateAndScaleAndTranslateChained := pRotateAndScaleAndTranslateChainedM.ToPoint()
+	expected = NewPoint(15, 0, 7)
+	if !pRotateAndScaleAndTranslateChained.IsEqual(*expected) {
+		t.Errorf("Expected transform * p = %v, but got %v", expected, pRotateAndScaleAndTranslateChained)
+	}
+
+}
