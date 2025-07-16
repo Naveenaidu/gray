@@ -1021,4 +1021,17 @@ func TestChainingTransformations(t *testing.T) {
 		t.Errorf("Expected transform * p = %v, but got %v", expected, pRotateAndScaleAndTranslateChained)
 	}
 
+	// Scenario: Chained Transformations using ChainedTransforms()
+	chainedTransformM := ChainTransforms([]*Matrix{
+		pM,
+		RotateXM(math.Pi / 2),
+		ScaleM(5, 5, 5),
+		TranslationM(10, 5, 7),
+	})
+	result := chainedTransformM.ToPoint()
+	expected = NewPoint(15, 0, 7)
+	if !result.IsEqual(*expected) {
+		t.Errorf("Expected transform * p = %v, but got %v", expected, result)
+	}
+
 }

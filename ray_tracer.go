@@ -706,3 +706,13 @@ func ShearM(xy float64, xz float64, yx float64, yz float64, zx float64, zy float
 		{0, 0, 0, 1},
 	})
 }
+
+func ChainTransforms(transformations []*Matrix) *Matrix {
+	chainTransformM := IdentityMatrix()
+
+	for t := len(transformations) - 1; t >= 0; t-- {
+		chainTransformM = chainTransformM.Multiply(*transformations[t])
+	}
+
+	return chainTransformM
+}
