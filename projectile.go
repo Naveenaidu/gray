@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 )
 
 type Projectile struct {
@@ -48,38 +49,62 @@ func ThrowProjectile(env Environment, proj Projectile, canvas *Canvas) Projectil
 	return projection(env, proj, canvas)
 }
 
+// ---- Projectile Main ------
+// func main() {
+// 	// fmt.Println(quote.Glass())
+
+// 	// start := Point{0, 1, 0}
+// 	// velocity := Vector{1, 1.8, 0}.Normalize().ScalarMultiply(11.25)
+// 	// gravity := Vector{0, -0.1, 0}
+// 	// wind := Vector{-0.01, 0, 0}
+
+// 	// canvas := NewCanvas(900, 500, *Black)
+
+// 	// // Projectile
+// 	// p := Projectile{position: start, velocity: *velocity}
+// 	// e := Environment{gravity: gravity, wind: wind}
+// 	// finalProjection := ThrowProjectile(e, p, canvas)
+// 	// canvas.WriteToPPM("projectile.ppm")
+// 	// fmt.Printf("\nfinal projectile position: %v+\n", finalProjection.position)
+
+// }
+
+func drawClock(radius float64, canvas *Canvas) {
+	// Get the center
+	centerX := canvas.width / 2
+	centerY := canvas.height / 2
+	center := NewPoint(float64(centerX), float64(centerY), 0.0)
+	fmt.Printf("\nCenter point %v+\n", center)
+	canvas.WritePixel(int(center.x), int(center.y), *Green)
+
+	/*
+		Learning: To draw a picture of your desire, you compute your drawing
+		from your imagined origin taking unit points as reference and then
+		compute the points to match your canvas dimensions
+	*/
+	refPointM := NewPoint(0, 1, 0).ToMatrix()
+	hourRotateM := RotateZM(math.Pi / 6)
+	for h := 0; h <= 11; h++ {
+		// Rotate the previous hour point by pi/6
+		nextHourPointM := ChainTransforms([]*Matrix{refPointM, hourRotateM})
+		nextHourPoint := nextHourPointM.ToPoint()
+		fmt.Printf("\n %d hour point %v", h+1, nextHourPoint)
+		// canvas.WritePixel(int(nextHourPoint.x), int(nextHourPoint.y), *Red)
+
+		// Convert these points to our frame
+		nextHourPointX := (nextHourPoint.x * radius) + float64(centerX)
+		nextHourPointY := (nextHourPoint.y * radius) + float64(centerY)
+		fmt.Printf("\n next hour point %v %v\n", nextHourPointX, nextHourPointY)
+
+		canvas.WritePixel(int(nextHourPointX), int(nextHourPointY), *Red)
+
+		refPointM = nextHourPointM
+	}
+
+}
+
 func main() {
-	// fmt.Println(quote.Glass())
-
-	// start := Point{0, 1, 0}
-	// velocity := Vector{1, 1.8, 0}.Normalize().ScalarMultiply(11.25)
-	// gravity := Vector{0, -0.1, 0}
-	// wind := Vector{-0.01, 0, 0}
-
-	// canvas := NewCanvas(900, 500, *Black)
-
-	// // Projectile
-	// p := Projectile{position: start, velocity: *velocity}
-	// e := Environment{gravity: gravity, wind: wind}
-	// finalProjection := ThrowProjectile(e, p, canvas)
-	// canvas.WriteToPPM("projectile.ppm")
-	// fmt.Printf("\nfinal projectile position: %v+\n", finalProjection.position)
-
-	m1 := NewMatrix(4, 4, [][]float64{
-		{1, 2, 3, 4},
-		{5, 6, 7, 8},
-		{9, 8, 7, 6},
-		{5, 4, 3, 2},
-	})
-
-	m2 := NewMatrix(4, 4, [][]float64{
-		{-2, 1, 2, 3},
-		{3, 2, 1, -1},
-		{4, 3, 4, 5},
-		{1, 2, 7, 8},
-	})
-
-	result := m1.Multiply(*m2)
-	result.PrintMatrix()
-
+	canvas := NewCanvas(100, 100, *Black)
+	drawClock(15, canvas)
+	canvas.WriteToPPM("clock.ppm")
 }
