@@ -3,49 +3,52 @@ package main
 import (
 	"fmt"
 	"math"
+
+	"github.com/Naveenaidu/gray/src/geometry"
+	"github.com/Naveenaidu/gray/src/world"
 )
 
 type Projectile struct {
-	position Point
-	velocity Vector
+	position geometry.Point
+	velocity geometry.Vector
 }
 
 type Environment struct {
-	gravity Vector
-	wind    Vector
+	gravity geometry.Vector
+	wind    geometry.Vector
 }
 
 func tick(env Environment, proj Projectile) Projectile {
 	position := proj.position.AddVector(proj.velocity)
-	velocity := AddVectors([]Vector{proj.velocity, env.gravity, env.wind})
+	velocity := geometry.AddVectors([]geometry.Vector{proj.velocity, env.gravity, env.wind})
 	return Projectile{*position, *velocity}
 }
 
-func projection(env Environment, proj Projectile, canvas *Canvas) Projectile {
-	if proj.position.y <= 0 {
+func projection(env Environment, proj Projectile, canvas *world.Canvas) Projectile {
+	if proj.position.Y <= 0 {
 		return proj
 	}
 
 	newproj := tick(env, proj)
 	// Plot each projection on the canvas
 	// The y coordinate is subtracted with canvas height to match our canvas coordinates
-	proj_canvas_y := canvas.height - int(newproj.position.y)
-	proj_canvas_x := int(newproj.position.x)
+	proj_canvas_y := canvas.Height - int(newproj.position.Y)
+	proj_canvas_x := int(newproj.position.X)
 
 	// exit early if the projectile is going out of bounds of canvas
-	if proj_canvas_y < 0 || proj_canvas_y >= canvas.height || (proj_canvas_x >= canvas.width) {
+	if proj_canvas_y < 0 || proj_canvas_y >= canvas.Height || (proj_canvas_x >= canvas.Width) {
 		return proj
 	}
 
 	fmt.Printf("Projectile Position: %v+\n", newproj.position)
 	fmt.Printf("Projectile canvas Position: %d, %d\n", proj_canvas_x, proj_canvas_y)
 
-	canvas.WritePixel(proj_canvas_x, proj_canvas_y, *Red)
+	canvas.WritePixel(proj_canvas_x, proj_canvas_y, *world.Red)
 
 	return projection(env, newproj, canvas)
 }
 
-func ThrowProjectile(env Environment, proj Projectile, canvas *Canvas) Projectile {
+func ThrowProjectile(env Environment, proj Projectile, canvas *world.Canvas) Projectile {
 	return projection(env, proj, canvas)
 }
 
@@ -69,34 +72,34 @@ func ThrowProjectile(env Environment, proj Projectile, canvas *Canvas) Projectil
 
 // }
 
-func drawClock(radius float64, canvas *Canvas) {
+func drawClock(radius float64, canvas *world.Canvas) {
 	// Get the center
-	centerX := canvas.width / 2
-	centerY := canvas.height / 2
-	center := NewPoint(float64(centerX), float64(centerY), 0.0)
+	centerX := canvas.Width / 2
+	centerY := canvas.Height / 2
+	center := geometry.NewPoint(float64(centerX), float64(centerY), 0.0)
 	fmt.Printf("\nCenter point %v+\n", center)
-	canvas.WritePixel(int(center.x), int(center.y), *Green)
+	canvas.WritePixel(int(center.X), int(center.Y), *world.Green)
 
 	/*
 		Learning: To draw a picture of your desire, you compute your drawing
 		from your imagined origin taking unit points as reference and then
 		compute the points to match your canvas dimensions
 	*/
-	refPointM := NewPoint(0, 1, 0).ToMatrix()
-	hourRotateM := RotateZM(math.Pi / 6)
+	refPointM := geometry.NewPoint(0, 1, 0).ToMatrix()
+	hourRotateM := geometry.RotateZM(math.Pi / 6)
 	for h := 0; h <= 11; h++ {
 		// Rotate the previous hour point by pi/6
-		nextHourPointM := ChainTransforms([]*Matrix{refPointM, hourRotateM})
+		nextHourPointM := geometry.ChainTransforms([]*geometry.Matrix{refPointM, hourRotateM})
 		nextHourPoint := nextHourPointM.ToPoint()
 		fmt.Printf("\n %d hour point %v", h+1, nextHourPoint)
-		// canvas.WritePixel(int(nextHourPoint.x), int(nextHourPoint.y), *Red)
+		// canvas.WritePixel(int(nextHourPoint.X), int(nextHourPoint.Y), *Red)
 
 		// Convert these points to our frame
-		nextHourPointX := (nextHourPoint.x * radius) + float64(centerX)
-		nextHourPointY := (nextHourPoint.y * radius) + float64(centerY)
+		nextHourPointX := (nextHourPoint.X * radius) + float64(centerX)
+		nextHourPointY := (nextHourPoint.Y * radius) + float64(centerY)
 		fmt.Printf("\n next hour point %v %v\n", nextHourPointX, nextHourPointY)
 
-		canvas.WritePixel(int(nextHourPointX), int(nextHourPointY), *Red)
+		canvas.WritePixel(int(nextHourPointX), int(nextHourPointY), *world.Red)
 
 		refPointM = nextHourPointM
 	}
@@ -104,7 +107,7 @@ func drawClock(radius float64, canvas *Canvas) {
 }
 
 func main() {
-	canvas := NewCanvas(100, 100, *Black)
+	canvas := world.NewCanvas(100, 100, *world.Black)
 	drawClock(15, canvas)
 	canvas.WriteToPPM("clock.ppm")
 }

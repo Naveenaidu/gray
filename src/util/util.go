@@ -1,4 +1,4 @@
-package main
+package util
 
 import (
 	"math"
@@ -6,7 +6,7 @@ import (
 
 const floatEqualityThreshold = 1e-5
 
-func isFloatEqual(a, b float64) bool {
+func IsFloatEqual(a, b float64) bool {
 	return math.Abs(a-b) <= floatEqualityThreshold
 }
 
