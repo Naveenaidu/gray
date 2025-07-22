@@ -1,4 +1,4 @@
-package geometry
+package geom
 
 import "github.com/Naveenaidu/gray/src/util"
 

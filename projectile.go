@@ -4,23 +4,23 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/Naveenaidu/gray/src/geometry"
+	"github.com/Naveenaidu/gray/src/geom"
 	"github.com/Naveenaidu/gray/src/world"
 )
 
 type Projectile struct {
-	position geometry.Point
-	velocity geometry.Vector
+	position geom.Point
+	velocity geom.Vector
 }
 
 type Environment struct {
-	gravity geometry.Vector
-	wind    geometry.Vector
+	gravity geom.Vector
+	wind    geom.Vector
 }
 
 func tick(env Environment, proj Projectile) Projectile {
 	position := proj.position.AddVector(proj.velocity)
-	velocity := geometry.AddVectors([]geometry.Vector{proj.velocity, env.gravity, env.wind})
+	velocity := geom.AddVectors([]geom.Vector{proj.velocity, env.gravity, env.wind})
 	return Projectile{*position, *velocity}
 }
 
@@ -76,7 +76,7 @@ func drawClock(radius float64, canvas *world.Canvas) {
 	// Get the center
 	centerX := canvas.Width / 2
 	centerY := canvas.Height / 2
-	center := geometry.NewPoint(float64(centerX), float64(centerY), 0.0)
+	center := geom.NewPoint(float64(centerX), float64(centerY), 0.0)
 	fmt.Printf("\nCenter point %v+\n", center)
 	canvas.WritePixel(int(center.X), int(center.Y), *world.Green)
 
@@ -85,11 +85,11 @@ func drawClock(radius float64, canvas *world.Canvas) {
 		from your imagined origin taking unit points as reference and then
 		compute the points to match your canvas dimensions
 	*/
-	refPointM := geometry.NewPoint(0, 1, 0).ToMatrix()
-	hourRotateM := geometry.RotateZM(math.Pi / 6)
+	refPointM := geom.NewPoint(0, 1, 0).ToMatrix()
+	hourRotateM := geom.RotateZM(math.Pi / 6)
 	for h := 0; h <= 11; h++ {
 		// Rotate the previous hour point by pi/6
-		nextHourPointM := geometry.ChainTransforms([]*geometry.Matrix{refPointM, hourRotateM})
+		nextHourPointM := geom.ChainTransforms([]*geom.Matrix{refPointM, hourRotateM})
 		nextHourPoint := nextHourPointM.ToPoint()
 		fmt.Printf("\n %d hour point %v", h+1, nextHourPoint)
 		// canvas.WritePixel(int(nextHourPoint.X), int(nextHourPoint.Y), *Red)
