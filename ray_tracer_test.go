@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/Naveenaidu/gray/src/geom"
+	"github.com/Naveenaidu/gray/src/rayt"
 	"github.com/Naveenaidu/gray/src/util"
 	"github.com/Naveenaidu/gray/src/world"
 )
@@ -1038,4 +1039,40 @@ func TestChainingTransformations(t *testing.T) {
 		t.Errorf("Expected transform * p = %v, but got %v", expected, result)
 	}
 
+}
+
+/* ------------- Rays --------------- */
+func TestRayPosition(t *testing.T) {
+	// Given r ← ray(point(2, 3, 4), vector(1, 0, 0))
+	origin := geom.NewPoint(2, 3, 4)
+	direction := geom.NewVector(1, 0, 0)
+	r := rayt.Ray{Origin: *origin, Direction: *direction}
+
+	// Then position(r, 0) = point(2, 3, 4)
+	result := r.Position(0)
+	expected := geom.NewPoint(2, 3, 4)
+	if !result.IsEqual(*expected) {
+		t.Errorf("Expected position(r, 0) = %v, but got %v", expected, result)
+	}
+
+	// And position(r, 1) = point(3, 3, 4)
+	result = r.Position(1)
+	expected = geom.NewPoint(3, 3, 4)
+	if !result.IsEqual(*expected) {
+		t.Errorf("Expected position(r, 1) = %v, but got %v", expected, result)
+	}
+
+	// And position(r, -1) = point(1, 3, 4)
+	result = r.Position(-1)
+	expected = geom.NewPoint(1, 3, 4)
+	if !result.IsEqual(*expected) {
+		t.Errorf("Expected position(r, -1) = %v, but got %v", expected, result)
+	}
+
+	// And position(r, 2.5) = point(4.5, 3, 4)
+	result = r.Position(2.5)
+	expected = geom.NewPoint(4.5, 3, 4)
+	if !result.IsEqual(*expected) {
+		t.Errorf("Expected position(r, 2.5) = %v, but got %v", expected, result)
+	}
 }
