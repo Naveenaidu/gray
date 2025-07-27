@@ -1076,3 +1076,143 @@ func TestRayPosition(t *testing.T) {
 		t.Errorf("Expected position(r, 2.5) = %v, but got %v", expected, result)
 	}
 }
+
+func TestRayIntersectsSphereAtTwoPoints(t *testing.T) {
+	// Scenario: A ray intersects a sphere at two points
+	// Given r ← ray(point(0, 0, -5), vector(0, 0, 1))
+	r := rayt.Ray{
+		Origin:    *geom.NewPoint(0, 0, -5),
+		Direction: *geom.NewVector(0, 0, 1),
+	}
+
+	// And s ← sphere()
+	s := geom.UnitSphere()
+
+	// When xs ← intersect(s, r)
+	xs := r.IntersectSphere(*s)
+
+	// Then xs.count = 2
+	if len(xs) != 2 {
+		t.Errorf("Expected xs.count = 2, but got %d", len(xs))
+	}
+
+	// And xs[0] = 4.0
+	if xs[0] != 4.0 {
+		t.Errorf("Expected xs[0] = 4.0, but got %v", xs[0])
+	}
+
+	// And xs[1] = 6.0
+	if xs[1] != 6.0 {
+		t.Errorf("Expected xs[1] = 6.0, but got %v", xs[1])
+	}
+}
+
+func TestRayIntersectsSphereAtTangent(t *testing.T) {
+	// Scenario: A ray intersects a sphere at a tangent
+	// Given r ← ray(point(0, 1, -5), vector(0, 0, 1))
+	r := rayt.Ray{
+		Origin:    *geom.NewPoint(0, 1, -5),
+		Direction: *geom.NewVector(0, 0, 1),
+	}
+
+	// And s ← sphere()
+	s := geom.UnitSphere()
+
+	// When xs ← intersect(s, r)
+	xs := r.IntersectSphere(*s)
+
+	// Then xs.count = 0
+	if len(xs) != 2 {
+		t.Errorf("Expected xs.count = 2, but got %d", len(xs))
+	}
+
+	// And xs[0] = 5.0
+	if xs[0] != 5.0 {
+		t.Errorf("Expected xs[0] = 5.0, but got %v", xs[0])
+	}
+
+	// And xs[1] = 5.0
+	if xs[1] != 5.0 {
+		t.Errorf("Expected xs[1] = 5.0, but got %v", xs[1])
+	}
+}
+
+func TestRayMissesSphere(t *testing.T) {
+	// Scenario: A ray misses a sphere
+	// Given r ← ray(point(0, 2, -5), vector(0, 0, 1))
+	r := rayt.Ray{
+		Origin:    *geom.NewPoint(0, 2, -5),
+		Direction: *geom.NewVector(0, 0, 1),
+	}
+
+	// And s ← sphere()
+	s := geom.UnitSphere()
+
+	// When xs ← intersect(s, r)
+	xs := r.IntersectSphere(*s)
+
+	// Then xs.count = 0
+	if len(xs) != 0 {
+		t.Errorf("Expected xs.count = 0, but got %d", len(xs))
+	}
+}
+
+func TestRayOriginatesInsideSphere(t *testing.T) {
+	// Scenario: A ray originates inside a sphere
+	// Given r ← ray(point(0, 0, 0), vector(0, 0, 1))
+	r := rayt.Ray{
+		Origin:    *geom.NewPoint(0, 0, 0),
+		Direction: *geom.NewVector(0, 0, 1),
+	}
+
+	// And s ← sphere()
+	s := geom.UnitSphere()
+
+	// When xs ← intersect(s, r)
+	xs := r.IntersectSphere(*s)
+
+	// Then xs.count = 2
+	if len(xs) != 2 {
+		t.Errorf("Expected xs.count = 2, but got %d", len(xs))
+	}
+
+	// And xs[0] = -1.0
+	if xs[0] != -1.0 {
+		t.Errorf("Expected xs[0] = -1.0, but got %v", xs[0])
+	}
+
+	// And xs[1] = 1.0
+	if xs[1] != 1.0 {
+		t.Errorf("Expected xs[1] = 1.0, but got %v", xs[1])
+	}
+}
+
+func TestSphereIsBehindRay(t *testing.T) {
+	// Scenario: A sphere is behind a ray
+	// Given r ← ray(point(0, 0, 5), vector(0, 0, 1))
+	r := rayt.Ray{
+		Origin:    *geom.NewPoint(0, 0, 5),
+		Direction: *geom.NewVector(0, 0, 1),
+	}
+
+	// And s ← sphere()
+	s := geom.UnitSphere()
+
+	// When xs ← intersect(s, r)
+	xs := r.IntersectSphere(*s)
+
+	// Then xs.count = 2
+	if len(xs) != 2 {
+		t.Errorf("Expected xs.count = 2, but got %d", len(xs))
+	}
+
+	// And xs[0] = -6.0
+	if xs[0] != -6.0 {
+		t.Errorf("Expected xs[0] = -6.0, but got %v", xs[0])
+	}
+
+	// And xs[1] = -4.0
+	if xs[1] != -4.0 {
+		t.Errorf("Expected xs[1] = -4.0, but got %v", xs[1])
+	}
+}

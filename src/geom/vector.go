@@ -65,6 +65,7 @@ func (v1 Vector) Normalize() *Vector {
 	return &Vector{v1.X / v1_magnitude, v1.Y / v1_magnitude, v1.Z / v1_magnitude}
 }
 
+// TODO: Naveen: Convert this API to "DotProduct(v1 Vector, v2 Vector)" for better readbility
 func (v1 Vector) DotProduct(v2 Vector) float64 {
 	return (v1.X*v2.X + v1.Y*v2.Y + v1.Z*v2.Z)
 }
