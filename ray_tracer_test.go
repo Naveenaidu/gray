@@ -1097,12 +1097,12 @@ func TestRayIntersectsSphereAtTwoPoints(t *testing.T) {
 	}
 
 	// And xs[0] = 4.0
-	if xs[0] != 4.0 {
+	if xs[0].T != 4.0 {
 		t.Errorf("Expected xs[0] = 4.0, but got %v", xs[0])
 	}
 
 	// And xs[1] = 6.0
-	if xs[1] != 6.0 {
+	if xs[1].T != 6.0 {
 		t.Errorf("Expected xs[1] = 6.0, but got %v", xs[1])
 	}
 }
@@ -1127,12 +1127,12 @@ func TestRayIntersectsSphereAtTangent(t *testing.T) {
 	}
 
 	// And xs[0] = 5.0
-	if xs[0] != 5.0 {
+	if xs[0].T != 5.0 {
 		t.Errorf("Expected xs[0] = 5.0, but got %v", xs[0])
 	}
 
 	// And xs[1] = 5.0
-	if xs[1] != 5.0 {
+	if xs[1].T != 5.0 {
 		t.Errorf("Expected xs[1] = 5.0, but got %v", xs[1])
 	}
 }
@@ -1177,12 +1177,12 @@ func TestRayOriginatesInsideSphere(t *testing.T) {
 	}
 
 	// And xs[0] = -1.0
-	if xs[0] != -1.0 {
+	if xs[0].T != -1.0 {
 		t.Errorf("Expected xs[0] = -1.0, but got %v", xs[0])
 	}
 
 	// And xs[1] = 1.0
-	if xs[1] != 1.0 {
+	if xs[1].T != 1.0 {
 		t.Errorf("Expected xs[1] = 1.0, but got %v", xs[1])
 	}
 }
@@ -1207,12 +1207,69 @@ func TestSphereIsBehindRay(t *testing.T) {
 	}
 
 	// And xs[0] = -6.0
-	if xs[0] != -6.0 {
+	if xs[0].T != -6.0 {
 		t.Errorf("Expected xs[0] = -6.0, but got %v", xs[0])
 	}
 
 	// And xs[1] = -4.0
-	if xs[1] != -4.0 {
+	if xs[1].T != -4.0 {
 		t.Errorf("Expected xs[1] = -4.0, but got %v", xs[1])
+	}
+}
+
+func TestHit_AllPositiveT(t *testing.T) {
+	s := geom.UnitSphere()
+	i1 := rayt.NewIntersection(1, *s)
+	i2 := rayt.NewIntersection(2, *s)
+	xs := []rayt.Intersection{i2, i1}
+
+	hit := rayt.Ray{}.Hit(xs)
+	if hit == nil {
+		t.Errorf("Expect hit to be i1 (%v), but got nil value", i1)
+	} else if *hit != i1 {
+		t.Errorf("Expected hit to be i1 (%v), but got %v", i1, hit)
+	}
+}
+
+func TestHit_SomeNegativeT(t *testing.T) {
+	s := geom.UnitSphere()
+	i1 := rayt.NewIntersection(-1, *s)
+	i2 := rayt.NewIntersection(1, *s)
+	xs := []rayt.Intersection{i2, i1}
+
+	hit := rayt.Ray{}.Hit(xs)
+	if hit == nil {
+		t.Errorf("Expect hit to be i2 (%v), but got nil value", i2)
+	} else if *hit != i2 {
+		t.Errorf("Expected hit to be i2 (%v), but got %v", i2, hit)
+	}
+}
+
+func TestHit_AllNegativeT(t *testing.T) {
+	s := geom.UnitSphere()
+	i1 := rayt.NewIntersection(-2, *s)
+	i2 := rayt.NewIntersection(-1, *s)
+	xs := []rayt.Intersection{i2, i1}
+
+	hit := rayt.Ray{}.Hit(xs)
+
+	if hit != nil {
+		t.Errorf("Expected hit to be nil, but got %v", hit)
+	}
+}
+
+func TestHit_LowestNonnegativeIntersection(t *testing.T) {
+	s := geom.UnitSphere()
+	i1 := rayt.NewIntersection(5, *s)
+	i2 := rayt.NewIntersection(7, *s)
+	i3 := rayt.NewIntersection(-3, *s)
+	i4 := rayt.NewIntersection(2, *s)
+	xs := []rayt.Intersection{i1, i2, i3, i4}
+
+	hit := rayt.Ray{}.Hit(xs)
+	if hit == nil {
+		t.Errorf("Expect hit to be i4 (%v), but got nil value", i4)
+	} else if *hit != i4 {
+		t.Errorf("Expected hit to be i4 (%v), but got %v", i4, hit)
 	}
 }
