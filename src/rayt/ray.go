@@ -32,12 +32,15 @@ func (r Ray) Position(t float64) *geom.Point {
 func (r Ray) IntersectSphere(s geom.Sphere) []Intersection {
 	intersections := []Intersection{}
 
+	//apply the inverse of the sphere trasnformation to  ray
+	transformedRay := r.Transform(s.Transform.Inverse())
+
 	// We assume the spehre is at origin
 	// vector from sphere origin, to the ray origin
-	sphereToRay := (r.Origin).Subtract(s.Center)
+	sphereToRay := (transformedRay.Origin).Subtract(s.Center)
 
-	a := r.Direction.DotProduct(r.Direction)
-	b := 2 * (r.Direction.DotProduct(*sphereToRay))
+	a := transformedRay.Direction.DotProduct(transformedRay.Direction)
+	b := 2 * (transformedRay.Direction.DotProduct(*sphereToRay))
 	c := sphereToRay.DotProduct(*sphereToRay) - math.Pow(s.Radius, 2)
 
 	discriminant := math.Pow(b, 2) - 4*a*c
@@ -76,4 +79,14 @@ func (r Ray) Hit(intersections []Intersection) *Intersection {
 
 	return &nonNegativeIntersections[0]
 
+}
+
+func (r Ray) Transform(m *geom.Matrix) Ray {
+	transformedRayPointM := geom.ChainTransforms([]*geom.Matrix{r.Origin.ToMatrix(), m})
+	transformedDirectionM := geom.ChainTransforms([]*geom.Matrix{r.Direction.ToMatrix(), m})
+	return Ray{
+		Origin: *transformedRayPointM.ToPoint(),
+		// Direction: r.Direction,
+		Direction: *transformedDirectionM.ToVector(),
+	}
 }

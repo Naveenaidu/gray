@@ -1226,7 +1226,7 @@ func TestHit_AllPositiveT(t *testing.T) {
 	hit := rayt.Ray{}.Hit(xs)
 	if hit == nil {
 		t.Errorf("Expect hit to be i1 (%v), but got nil value", i1)
-	} else if *hit != i1 {
+	} else if hit.T != i1.T {
 		t.Errorf("Expected hit to be i1 (%v), but got %v", i1, hit)
 	}
 }
@@ -1240,7 +1240,7 @@ func TestHit_SomeNegativeT(t *testing.T) {
 	hit := rayt.Ray{}.Hit(xs)
 	if hit == nil {
 		t.Errorf("Expect hit to be i2 (%v), but got nil value", i2)
-	} else if *hit != i2 {
+	} else if hit.T != i2.T {
 		t.Errorf("Expected hit to be i2 (%v), but got %v", i2, hit)
 	}
 }
@@ -1269,7 +1269,123 @@ func TestHit_LowestNonnegativeIntersection(t *testing.T) {
 	hit := rayt.Ray{}.Hit(xs)
 	if hit == nil {
 		t.Errorf("Expect hit to be i4 (%v), but got nil value", i4)
-	} else if *hit != i4 {
+	} else if hit.T != i4.T {
 		t.Errorf("Expected hit to be i4 (%v), but got %v", i4, hit)
+	}
+}
+
+func TestTranslatingRay(t *testing.T) {
+	// Scenario: Translating a ray
+	// Given r ← ray(point(1, 2, 3), vector(0, 1, 0))
+	r := rayt.Ray{
+		Origin:    *geom.NewPoint(1, 2, 3),
+		Direction: *geom.NewVector(0, 1, 0),
+	}
+	// And m ← translation(3, 4, 5)
+	m := geom.TranslationM(3, 4, 5)
+	// When r2 ← transform(r, m)
+	r2 := r.Transform(m)
+	// Then r2.origin = point(4, 6, 8)
+	expectedOrigin := geom.NewPoint(4, 6, 8)
+	if !r2.Origin.IsEqual(*expectedOrigin) {
+		t.Errorf("Expected r2.origin = %v, but got %v", expectedOrigin, r2.Origin)
+	}
+	// And r2.direction = vector(0, 1, 0)
+	expectedDirection := geom.NewVector(0, 1, 0)
+	if !r2.Direction.IsEqual(*expectedDirection) {
+		t.Errorf("Expected r2.direction = %v, but got %v", expectedDirection, r2.Direction)
+	}
+}
+
+func TestScalingRay(t *testing.T) {
+	// Scenario: Scaling a ray
+	// Given r ← ray(point(1, 2, 3), vector(0, 1, 0))
+	r := rayt.Ray{
+		Origin:    *geom.NewPoint(1, 2, 3),
+		Direction: *geom.NewVector(0, 1, 0),
+	}
+	// And m ← scaling(2, 3, 4)
+	m := geom.ScaleM(2, 3, 4)
+	// When r2 ← transform(r, m)
+	r2 := r.Transform(m)
+	// Then r2.origin = point(2, 6, 12)
+	expectedOrigin := geom.NewPoint(2, 6, 12)
+	if !r2.Origin.IsEqual(*expectedOrigin) {
+		t.Errorf("Expected r2.origin = %v, but got %v", expectedOrigin, r2.Origin)
+	}
+	// And r2.direction = vector(0, 3, 0)
+	expectedDirection := geom.NewVector(0, 3, 0)
+	if !r2.Direction.IsEqual(*expectedDirection) {
+		t.Errorf("Expected r2.direction = %v, but got %v", expectedDirection, r2.Direction)
+	}
+}
+
+func TestSphereDefaultTransformation(t *testing.T) {
+	// Scenario: A sphere's default transformation
+	// Given s ← sphere()
+	s := geom.UnitSphere()
+	// Then s.transform = identity_matrix
+	if !s.Transform.IsEqual(*geom.IdentityMatrix()) {
+		t.Errorf("Expected sphere's default transform to be identity matrix, but got %v", s.Transform.Value)
+	}
+}
+
+func TestChangingSphereTransformation(t *testing.T) {
+	// Scenario: Changing a sphere's transformation
+	// Given s ← sphere()
+	s := geom.UnitSphere()
+	// And t ← translation(2, 3, 4)
+	tm := geom.TranslationM(2, 3, 4)
+	// When set_transform(s, t)
+	s.Transform = *tm
+	// Then s.transform = t
+	if !s.Transform.IsEqual(*tm) {
+		t.Errorf("Expected sphere's transform to be %v, but got %v", tm.Value, s.Transform.Value)
+	}
+}
+
+func TestIntersectingScaledSphereWithRay(t *testing.T) {
+	// Scenario: Intersecting a scaled sphere with a ray
+	// Given r ← ray(point(0, 0, -5), vector(0, 0, 1))
+	r := rayt.Ray{
+		Origin:    *geom.NewPoint(0, 0, -5),
+		Direction: *geom.NewVector(0, 0, 1),
+	}
+	// And s ← sphere()
+	s := geom.UnitSphere()
+	// When set_transform(s, scaling(2, 2, 2))
+	s.Transform = *geom.ScaleM(2, 2, 2)
+
+	xs := r.IntersectSphere(*s)
+	// Then xs.count = 2
+	if len(xs) != 2 {
+		t.Errorf("Expected xs.count = 2, but got %d", len(xs))
+	}
+	// And xs[0].t = 3
+	if !util.IsFloatEqual(xs[0].T, 3.0) {
+		t.Errorf("Expected xs[0].t = 3, but got %v", xs[0].T)
+	}
+	// And xs[1].t = 7
+	if !util.IsFloatEqual(xs[1].T, 7.0) {
+		t.Errorf("Expected xs[1].t = 7, but got %v", xs[1].T)
+	}
+}
+
+func TestIntersectingTranslatedSphereWithRay(t *testing.T) {
+	// Scenario: Intersecting a translated sphere with a ray
+	// Given r ← ray(point(0, 0, -5), vector(0, 0, 1))
+	r := rayt.Ray{
+		Origin:    *geom.NewPoint(0, 0, -5),
+		Direction: *geom.NewVector(0, 0, 1),
+	}
+	// And s ← sphere()
+	s := geom.UnitSphere()
+	// When set_transform(s, translation(5, 0, 0))
+	s.Transform = *geom.TranslationM(5, 0, 0)
+
+	xs := r.IntersectSphere(*s)
+	// Then xs.count = 0
+	if len(xs) != 0 {
+		t.Errorf("Expected xs.count = 0, but got %d", len(xs))
 	}
 }
