@@ -5,6 +5,7 @@ import (
 	"math"
 
 	"github.com/Naveenaidu/gray/src/geom"
+	"github.com/Naveenaidu/gray/src/rayt"
 	"github.com/Naveenaidu/gray/src/world"
 )
 
@@ -106,8 +107,43 @@ func drawClock(radius float64, canvas *world.Canvas) {
 
 }
 
+// ----- Draw Clock Main ---------
+// func main() {
+// 	canvas := world.NewCanvas(100, 100, *world.Black)
+// 	drawClock(15, canvas)
+// 	canvas.WriteToPPM("clock.ppm")
+// }
+
 func main() {
-	canvas := world.NewCanvas(100, 100, *world.Black)
-	drawClock(15, canvas)
-	canvas.WriteToPPM("clock.ppm")
+	canvas := world.NewCanvas(200, 200, *world.Black)
+
+	sphere := geom.UnitSphere()
+	sphere.Transform = *geom.ChainTransforms([]*geom.Matrix{
+		geom.ScaleM(30, 30, 30),
+		geom.TranslationM(100, 100, 0),
+	})
+
+	// assumed ray origin
+	rayOrigin := geom.NewPoint(100, 100, 100)
+
+	for h := 0; h < canvas.Height; h++ {
+		for w := 0; w < canvas.Width; w++ {
+			pixel := geom.NewPoint(float64(w), float64(h), 0.0)
+			rayDirection := pixel.Subtract(*rayOrigin)
+			ray := rayt.Ray{Origin: *rayOrigin, Direction: *rayDirection}
+
+			// TODO: A better interface possible ?
+			// Intersect the ray with sphere
+			intersections := ray.IntersectSphere(*sphere)
+			hit := ray.Hit(intersections)
+
+			if hit != nil {
+				// for now, just color the pixel where the ray hit
+				canvas.WritePixel(int(pixel.X), int(pixel.Y), *world.Red)
+			}
+
+		}
+	}
+
+	canvas.WriteToPPM("circle.ppm")
 }
