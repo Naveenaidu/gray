@@ -7,6 +7,7 @@ import (
 
 	"github.com/Naveenaidu/gray/src/geom"
 	"github.com/Naveenaidu/gray/src/lighting"
+	"github.com/Naveenaidu/gray/src/material"
 	"github.com/Naveenaidu/gray/src/rayt"
 	"github.com/Naveenaidu/gray/src/util"
 	"github.com/Naveenaidu/gray/src/world"
@@ -1087,7 +1088,7 @@ func TestRayIntersectsSphereAtTwoPoints(t *testing.T) {
 	}
 
 	// And s ← sphere()
-	s := geom.UnitSphere()
+	s := material.UnitSphere()
 
 	// When xs ← intersect(s, r)
 	xs := r.IntersectSphere(*s)
@@ -1117,7 +1118,7 @@ func TestRayIntersectsSphereAtTangent(t *testing.T) {
 	}
 
 	// And s ← sphere()
-	s := geom.UnitSphere()
+	s := material.UnitSphere()
 
 	// When xs ← intersect(s, r)
 	xs := r.IntersectSphere(*s)
@@ -1147,7 +1148,7 @@ func TestRayMissesSphere(t *testing.T) {
 	}
 
 	// And s ← sphere()
-	s := geom.UnitSphere()
+	s := material.UnitSphere()
 
 	// When xs ← intersect(s, r)
 	xs := r.IntersectSphere(*s)
@@ -1167,7 +1168,7 @@ func TestRayOriginatesInsideSphere(t *testing.T) {
 	}
 
 	// And s ← sphere()
-	s := geom.UnitSphere()
+	s := material.UnitSphere()
 
 	// When xs ← intersect(s, r)
 	xs := r.IntersectSphere(*s)
@@ -1197,7 +1198,7 @@ func TestSphereIsBehindRay(t *testing.T) {
 	}
 
 	// And s ← sphere()
-	s := geom.UnitSphere()
+	s := material.UnitSphere()
 
 	// When xs ← intersect(s, r)
 	xs := r.IntersectSphere(*s)
@@ -1219,7 +1220,7 @@ func TestSphereIsBehindRay(t *testing.T) {
 }
 
 func TestHit_AllPositiveT(t *testing.T) {
-	s := geom.UnitSphere()
+	s := material.UnitSphere()
 	i1 := rayt.NewIntersection(1, *s)
 	i2 := rayt.NewIntersection(2, *s)
 	xs := []rayt.Intersection{i2, i1}
@@ -1233,7 +1234,7 @@ func TestHit_AllPositiveT(t *testing.T) {
 }
 
 func TestHit_SomeNegativeT(t *testing.T) {
-	s := geom.UnitSphere()
+	s := material.UnitSphere()
 	i1 := rayt.NewIntersection(-1, *s)
 	i2 := rayt.NewIntersection(1, *s)
 	xs := []rayt.Intersection{i2, i1}
@@ -1247,7 +1248,7 @@ func TestHit_SomeNegativeT(t *testing.T) {
 }
 
 func TestHit_AllNegativeT(t *testing.T) {
-	s := geom.UnitSphere()
+	s := material.UnitSphere()
 	i1 := rayt.NewIntersection(-2, *s)
 	i2 := rayt.NewIntersection(-1, *s)
 	xs := []rayt.Intersection{i2, i1}
@@ -1260,7 +1261,7 @@ func TestHit_AllNegativeT(t *testing.T) {
 }
 
 func TestHit_LowestNonnegativeIntersection(t *testing.T) {
-	s := geom.UnitSphere()
+	s := material.UnitSphere()
 	i1 := rayt.NewIntersection(5, *s)
 	i2 := rayt.NewIntersection(7, *s)
 	i3 := rayt.NewIntersection(-3, *s)
@@ -1324,7 +1325,7 @@ func TestScalingRay(t *testing.T) {
 func TestSphereDefaultTransformation(t *testing.T) {
 	// Scenario: A sphere's default transformation
 	// Given s ← sphere()
-	s := geom.UnitSphere()
+	s := material.UnitSphere()
 	// Then s.transform = identity_matrix
 	if !s.Transform.IsEqual(*geom.IdentityMatrix()) {
 		t.Errorf("Expected sphere's default transform to be identity matrix, but got %v", s.Transform.Value)
@@ -1334,7 +1335,7 @@ func TestSphereDefaultTransformation(t *testing.T) {
 func TestChangingSphereTransformation(t *testing.T) {
 	// Scenario: Changing a sphere's transformation
 	// Given s ← sphere()
-	s := geom.UnitSphere()
+	s := material.UnitSphere()
 	// And t ← translation(2, 3, 4)
 	tm := geom.TranslationM(2, 3, 4)
 	// When set_transform(s, t)
@@ -1353,7 +1354,7 @@ func TestIntersectingScaledSphereWithRay(t *testing.T) {
 		Direction: *geom.NewVector(0, 0, 1),
 	}
 	// And s ← sphere()
-	s := geom.UnitSphere()
+	s := material.UnitSphere()
 	// When set_transform(s, scaling(2, 2, 2))
 	s.Transform = *geom.ScaleM(2, 2, 2)
 
@@ -1380,7 +1381,7 @@ func TestIntersectingTranslatedSphereWithRay(t *testing.T) {
 		Direction: *geom.NewVector(0, 0, 1),
 	}
 	// And s ← sphere()
-	s := geom.UnitSphere()
+	s := material.UnitSphere()
 	// When set_transform(s, translation(5, 0, 0))
 	s.Transform = *geom.TranslationM(5, 0, 0)
 
@@ -1396,7 +1397,7 @@ func TestIntersectingTranslatedSphereWithRay(t *testing.T) {
 func TestSphereNormalAt(t *testing.T) {
 	// Scenario: The normal on a sphere at a point on the x axis
 	// Given s ← sphere()
-	s := geom.UnitSphere()
+	s := material.UnitSphere()
 	// When n ← normal_at(s, point(1, 0, 0))
 	n := lighting.NormalAt(*s, *geom.NewPoint(1, 0, 0))
 	// Then n = vector(1, 0, 0)
@@ -1407,7 +1408,7 @@ func TestSphereNormalAt(t *testing.T) {
 
 	// Scenario: The normal on a sphere at a point on the y axis
 	// Given s ← sphere()
-	s = geom.UnitSphere()
+	s = material.UnitSphere()
 	// When n ← normal_at(s, point(0, 1, 0))
 	n = lighting.NormalAt(*s, *geom.NewPoint(0, 1, 0))
 	// Then n = vector(0, 1, 0)
@@ -1418,7 +1419,7 @@ func TestSphereNormalAt(t *testing.T) {
 
 	// Scenario: The normal on a sphere at a point on the z axis
 	// Given s ← sphere()
-	s = geom.UnitSphere()
+	s = material.UnitSphere()
 	// When n ← normal_at(s, point(0, 0, 1))
 	n = lighting.NormalAt(*s, *geom.NewPoint(0, 0, 1))
 	// Then n = vector(0, 0, 1)
@@ -1429,7 +1430,7 @@ func TestSphereNormalAt(t *testing.T) {
 
 	// Scenario: The normal on a sphere at a nonaxial point
 	// Given s ← sphere()
-	s = geom.UnitSphere()
+	s = material.UnitSphere()
 	// When n ← normal_at(s, point(√3/3, √3/3, √3/3))
 	sqrtThird := math.Sqrt(3) / 3
 	n = lighting.NormalAt(*s, *geom.NewPoint(sqrtThird, sqrtThird, sqrtThird))
@@ -1443,7 +1444,7 @@ func TestSphereNormalAt(t *testing.T) {
 func TestSphereNormalIsNormalized(t *testing.T) {
 	// Scenario: The normal is a normalized vector
 	// Given s ← sphere()
-	s := geom.UnitSphere()
+	s := material.UnitSphere()
 	// When n ← normal_at(s, point(√3/3, √3/3, √3/3))
 	sqrtThird := math.Sqrt(3) / 3
 	n := lighting.NormalAt(*s, *geom.NewPoint(sqrtThird, sqrtThird, sqrtThird))
@@ -1462,7 +1463,7 @@ func TestSphereNormalIsNormalized(t *testing.T) {
 func TestComputingNormalOnTranslatedSphere(t *testing.T) {
 	// Scenario: Computing the normal on a translated sphere
 	// Given s ← sphere()
-	s := geom.UnitSphere()
+	s := material.UnitSphere()
 	// And set_transform(s, translation(0, 1, 0))
 	s.Transform = *geom.ChainTransforms([]*geom.Matrix{
 		geom.TranslationM(0, 1, 0),
@@ -1479,7 +1480,7 @@ func TestComputingNormalOnTranslatedSphere(t *testing.T) {
 func TestComputingNormalOnTransformedSphere(t *testing.T) {
 	// Scenario: Computing the normal on a transformed sphere
 	// Given s ← sphere()
-	s := geom.UnitSphere()
+	s := material.UnitSphere()
 	// And m ← scaling(1, 0.5, 1) * rotation_z(π/5)
 	// And set_transform(s, m)
 	s.Transform = *geom.ChainTransforms([]*geom.Matrix{

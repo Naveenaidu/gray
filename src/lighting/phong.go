@@ -2,6 +2,7 @@ package lighting
 
 import (
 	"github.com/Naveenaidu/gray/src/geom"
+	"github.com/Naveenaidu/gray/src/material"
 	"github.com/Naveenaidu/gray/src/world"
 )
 
@@ -11,7 +12,7 @@ To calculate the normal for a sphere at a point, we do the following:
 2. Calculate the normal in object world
 3. Convert the object world normal into world coordinate system
 */
-func NormalAt(s geom.Sphere, p geom.Point) geom.Vector {
+func NormalAt(s material.Sphere, p geom.Point) geom.Vector {
 	// FIXME: Check if the transform can be invertible
 	// get the sphere to be at the origin in object world
 	invertTransformM := s.Transform.Inverse()

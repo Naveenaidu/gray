@@ -5,6 +5,7 @@ import (
 	"sort"
 
 	"github.com/Naveenaidu/gray/src/geom"
+	"github.com/Naveenaidu/gray/src/material"
 )
 
 type Ray struct {
@@ -15,10 +16,10 @@ type Ray struct {
 // TODO: Should "Intersection" be part of Ray struct
 type Intersection struct {
 	T      float64
-	Object geom.Sphere
+	Object material.Sphere
 }
 
-func NewIntersection(t float64, obj geom.Sphere) Intersection {
+func NewIntersection(t float64, obj material.Sphere) Intersection {
 	return Intersection{T: t, Object: obj}
 }
 
@@ -29,7 +30,7 @@ func (r Ray) Position(t float64) *geom.Point {
 	return newPosition
 }
 
-func (r Ray) IntersectSphere(s geom.Sphere) []Intersection {
+func (r Ray) IntersectSphere(s material.Sphere) []Intersection {
 	intersections := []Intersection{}
 
 	//apply the inverse of the sphere trasnformation to  ray

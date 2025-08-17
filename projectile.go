@@ -5,6 +5,7 @@ import (
 	"math"
 
 	"github.com/Naveenaidu/gray/src/geom"
+	"github.com/Naveenaidu/gray/src/material"
 	"github.com/Naveenaidu/gray/src/rayt"
 	"github.com/Naveenaidu/gray/src/world"
 )
@@ -117,7 +118,7 @@ func drawClock(radius float64, canvas *world.Canvas) {
 func main() {
 	canvas := world.NewCanvas(200, 200, *world.Black)
 
-	sphere := geom.UnitSphere()
+	sphere := material.UnitSphere()
 	sphere.Transform = *geom.ChainTransforms([]*geom.Matrix{
 		geom.ScaleM(30, 30, 30),
 		geom.TranslationM(100, 100, 0),
