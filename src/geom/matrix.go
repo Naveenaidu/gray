@@ -158,6 +158,19 @@ func IdentityMatrix() *Matrix {
 	})
 }
 
+/*
+This video explains the concept of transpose better: https://www.youtube.com/watch?v=g4ecBFmvAYU
+
+Some notes from the above:
+  - Transpose means transforming some measurement device in other spaces back to
+    that in original
+  - The job of transpose is to find out which covector could we use to directly
+    measure the original vector, such that we get the same measurement at the
+    end
+  - Transpose "looks like" inverse, but treat gridlines as covectors (my
+    thought: we use transpose when we want to retain the length of the covector.
+    That;s why we use this for computing normals)
+*/
 func (m Matrix) Transpose() *Matrix {
 	transposedMatrix := NewMatrix(m.Columns, m.Rows, [][]float64{})
 	for r := 0; r < m.Rows; r++ {

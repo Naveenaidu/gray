@@ -10,6 +10,10 @@ func NewPoint(x float64, y float64, z float64) *Point {
 	return &Point{x, y, z}
 }
 
+func ObjectOrigin() *Point {
+	return &Point{0.0, 0.0, 0.0}
+}
+
 func (p1 Point) IsEqual(p2 Point) bool {
 	return util.IsFloatEqual(p1.X, p2.X) &&
 		util.IsFloatEqual(p1.Y, p2.Y) &&

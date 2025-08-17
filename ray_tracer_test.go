@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/Naveenaidu/gray/src/geom"
+	"github.com/Naveenaidu/gray/src/lighting"
 	"github.com/Naveenaidu/gray/src/rayt"
 	"github.com/Naveenaidu/gray/src/util"
 	"github.com/Naveenaidu/gray/src/world"
@@ -1387,5 +1388,110 @@ func TestIntersectingTranslatedSphereWithRay(t *testing.T) {
 	// Then xs.count = 0
 	if len(xs) != 0 {
 		t.Errorf("Expected xs.count = 0, but got %d", len(xs))
+	}
+}
+
+/* ------------- Lighting and Shading --------------- */
+
+func TestSphereNormalAt(t *testing.T) {
+	// Scenario: The normal on a sphere at a point on the x axis
+	// Given s ← sphere()
+	s := geom.UnitSphere()
+	// When n ← normal_at(s, point(1, 0, 0))
+	n := lighting.NormalAt(*s, *geom.NewPoint(1, 0, 0))
+	// Then n = vector(1, 0, 0)
+	expected := geom.NewVector(1, 0, 0)
+	if !n.IsEqual(*expected) {
+		t.Errorf("Expected normal = %v, but got %v", expected, n)
+	}
+
+	// Scenario: The normal on a sphere at a point on the y axis
+	// Given s ← sphere()
+	s = geom.UnitSphere()
+	// When n ← normal_at(s, point(0, 1, 0))
+	n = lighting.NormalAt(*s, *geom.NewPoint(0, 1, 0))
+	// Then n = vector(0, 1, 0)
+	expected = geom.NewVector(0, 1, 0)
+	if !n.IsEqual(*expected) {
+		t.Errorf("Expected normal = %v, but got %v", expected, n)
+	}
+
+	// Scenario: The normal on a sphere at a point on the z axis
+	// Given s ← sphere()
+	s = geom.UnitSphere()
+	// When n ← normal_at(s, point(0, 0, 1))
+	n = lighting.NormalAt(*s, *geom.NewPoint(0, 0, 1))
+	// Then n = vector(0, 0, 1)
+	expected = geom.NewVector(0, 0, 1)
+	if !n.IsEqual(*expected) {
+		t.Errorf("Expected normal = %v, but got %v", expected, n)
+	}
+
+	// Scenario: The normal on a sphere at a nonaxial point
+	// Given s ← sphere()
+	s = geom.UnitSphere()
+	// When n ← normal_at(s, point(√3/3, √3/3, √3/3))
+	sqrtThird := math.Sqrt(3) / 3
+	n = lighting.NormalAt(*s, *geom.NewPoint(sqrtThird, sqrtThird, sqrtThird))
+	// Then n = vector(√3/3, √3/3, √3/3)
+	expected = geom.NewVector(sqrtThird, sqrtThird, sqrtThird)
+	if !n.IsEqual(*expected) {
+		t.Errorf("Expected normal = %v, but got %v", expected, n)
+	}
+}
+
+func TestSphereNormalIsNormalized(t *testing.T) {
+	// Scenario: The normal is a normalized vector
+	// Given s ← sphere()
+	s := geom.UnitSphere()
+	// When n ← normal_at(s, point(√3/3, √3/3, √3/3))
+	sqrtThird := math.Sqrt(3) / 3
+	n := lighting.NormalAt(*s, *geom.NewPoint(sqrtThird, sqrtThird, sqrtThird))
+	// Then n = normalize(n)
+	normalized := n.Normalize()
+	if !n.IsEqual(*normalized) {
+		t.Errorf("Expected normal to be normalized, but n = %v and normalize(n) = %v", n, normalized)
+	}
+
+	// Also verify that the magnitude is 1
+	if !util.IsFloatEqual(n.Magnitude(), 1.0) {
+		t.Errorf("Expected normal magnitude to be 1.0, but got %v", n.Magnitude())
+	}
+}
+
+func TestComputingNormalOnTranslatedSphere(t *testing.T) {
+	// Scenario: Computing the normal on a translated sphere
+	// Given s ← sphere()
+	s := geom.UnitSphere()
+	// And set_transform(s, translation(0, 1, 0))
+	s.Transform = *geom.ChainTransforms([]*geom.Matrix{
+		geom.TranslationM(0, 1, 0),
+	})
+	// When n ← normal_at(s, point(0, 1.70711, -0.70711))
+	n := lighting.NormalAt(*s, *geom.NewPoint(0, 1.70711, -0.70711))
+	// Then n = vector(0, 0.70711, -0.70711)
+	expected := geom.NewVector(0, 0.70711, -0.70711)
+	if !n.IsEqual(*expected) {
+		t.Errorf("Expected normal = %v, but got %v", expected, n)
+	}
+}
+
+func TestComputingNormalOnTransformedSphere(t *testing.T) {
+	// Scenario: Computing the normal on a transformed sphere
+	// Given s ← sphere()
+	s := geom.UnitSphere()
+	// And m ← scaling(1, 0.5, 1) * rotation_z(π/5)
+	// And set_transform(s, m)
+	s.Transform = *geom.ChainTransforms([]*geom.Matrix{
+		geom.RotateZM(math.Pi / 5),
+		geom.ScaleM(1, 0.5, 1),
+	})
+	// When n ← normal_at(s, point(0, √2/2, -√2/2))
+	sqrtHalf := math.Sqrt(2) / 2
+	n := lighting.NormalAt(*s, *geom.NewPoint(0, sqrtHalf, -sqrtHalf))
+	// Then n = vector(0, 0.97014, -0.24254)
+	expected := geom.NewVector(0, 0.97014, -0.24254)
+	if !n.IsEqual(*expected) {
+		t.Errorf("Expected normal = %v, but got %v", expected, n)
 	}
 }
