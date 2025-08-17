@@ -1495,3 +1495,32 @@ func TestComputingNormalOnTransformedSphere(t *testing.T) {
 		t.Errorf("Expected normal = %v, but got %v", expected, n)
 	}
 }
+
+func TestReflectVector(t *testing.T) {
+	// Scenario: Reflecting a vector approaching at 45°
+	// Given v ← vector(1, -1, 0)
+	v := geom.NewVector(1, -1, 0)
+	// And n ← vector(0, 1, 0)
+	n := geom.NewVector(0, 1, 0)
+	// When r ← reflect(v, n)
+	r := lighting.Reflect(*v, *n)
+	// Then r = vector(1, 1, 0)
+	expected := geom.NewVector(1, 1, 0)
+	if !r.IsEqual(*expected) {
+		t.Errorf("Expected reflect(v, n) = %v, but got %v", expected, r)
+	}
+
+	// Scenario: Reflecting a vector off a slanted surface
+	// Given v ← vector(0, -1, 0)
+	v = geom.NewVector(0, -1, 0)
+	// And n ← vector(√2/2, √2/2, 0)
+	sqrtHalf := math.Sqrt(2) / 2
+	n = geom.NewVector(sqrtHalf, sqrtHalf, 0)
+	// When r ← reflect(v, n)
+	r = lighting.Reflect(*v, *n)
+	// Then r = vector(1, 0, 0)
+	expected = geom.NewVector(1, 0, 0)
+	if !r.IsEqual(*expected) {
+		t.Errorf("Expected reflect(v, n) = %v, but got %v", expected, r)
+	}
+}

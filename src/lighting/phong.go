@@ -2,6 +2,7 @@ package lighting
 
 import (
 	"github.com/Naveenaidu/gray/src/geom"
+	"github.com/Naveenaidu/gray/src/world"
 )
 
 /*
@@ -22,4 +23,41 @@ func NormalAt(s geom.Sphere, p geom.Point) geom.Vector {
 	worldNormal := invertTransformM.Transpose().Multiply(*objectNormal.ToMatrix()).ToVector()
 
 	return *worldNormal.Normalize()
+}
+
+func Reflect(in geom.Vector, normal geom.Vector) geom.Vector {
+	// reflect(in, normal) = in - normal * 2 * dot(in, normal)
+	dotProduct := in.DotProduct(normal)
+	reflection := geom.SubtractVectors([]geom.Vector{
+		in,
+		*normal.ScalarMultiply(2 * dotProduct),
+	})
+	return *reflection
+}
+
+type Light struct {
+	Intensity world.Color
+	Position  geom.Point
+}
+
+func NewLight(intensity world.Color, pos geom.Point) Light {
+	return Light{intensity, pos}
+}
+
+type Material struct {
+	Color     world.Color
+	Ambient   float64 // ranges between 0 and 1
+	Diffuse   float64 // ranges between 0 and 1
+	Specular  float64 // ranges between 0 and 1
+	Shininess int     // ranges between 10 and 200
+}
+
+func DefaultMaterial() Material {
+	return Material{
+		Color:     *world.NewColor(1, 1, 1),
+		Ambient:   0.1,
+		Diffuse:   0.9,
+		Specular:  0.9,
+		Shininess: 200.0,
+	}
 }
