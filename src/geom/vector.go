@@ -56,6 +56,10 @@ func (v1 Vector) ScalarDivide(scalar float64) *Vector {
 	return &Vector{v1.X / scalar, v1.Y / scalar, v1.Z / scalar}
 }
 
+func (v1 Vector) Reverse() *Vector {
+	return v1.ScalarMultiply(-1)
+}
+
 func (v Vector) Magnitude() float64 {
 	return math.Sqrt(v.X*v.X + v.Y*v.Y + v.Z*v.Z)
 }

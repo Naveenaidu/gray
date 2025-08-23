@@ -5,6 +5,7 @@ import (
 	"math"
 
 	"github.com/Naveenaidu/gray/src/geom"
+	"github.com/Naveenaidu/gray/src/lighting"
 	"github.com/Naveenaidu/gray/src/material"
 	"github.com/Naveenaidu/gray/src/rayt"
 	"github.com/Naveenaidu/gray/src/world"
@@ -115,22 +116,28 @@ func drawClock(radius float64, canvas *world.Canvas) {
 // 	canvas.WriteToPPM("clock.ppm")
 // }
 
-func main() {
-	canvas := world.NewCanvas(200, 200, *world.Black)
+func drawSphereWithLight() {
+	canvas := world.NewCanvas(100, 100, *world.Black)
 
 	sphere := material.UnitSphere()
 	sphere.Transform = *geom.ChainTransforms([]*geom.Matrix{
 		geom.ScaleM(30, 30, 30),
-		geom.TranslationM(100, 100, 0),
+		geom.TranslationM(50, 50, 0),
 	})
+	sphere.Material = material.DefaultMaterial()
+	sphere.Material.Color = *world.NewColor(1, 0.2, 1)
 
 	// assumed ray origin
-	rayOrigin := geom.NewPoint(100, 100, 100)
+	rayOrigin := geom.NewPoint(50, 50, 50)
+
+	lightPosition := geom.NewPoint(-5, 5, 55)
+	lightColor := world.NewColor(1, 1, 1)
+	light := lighting.NewLight(*lightColor, *lightPosition)
 
 	for h := 0; h < canvas.Height; h++ {
 		for w := 0; w < canvas.Width; w++ {
 			pixel := geom.NewPoint(float64(w), float64(h), 0.0)
-			rayDirection := pixel.Subtract(*rayOrigin)
+			rayDirection := pixel.Subtract(*rayOrigin).Normalize()
 			ray := rayt.Ray{Origin: *rayOrigin, Direction: *rayDirection}
 
 			// TODO: A better interface possible ?
@@ -140,11 +147,21 @@ func main() {
 
 			if hit != nil {
 				// for now, just color the pixel where the ray hit
-				canvas.WritePixel(int(pixel.X), int(pixel.Y), *world.Red)
+				point := ray.Position(hit.T)
+				normal := lighting.NormalAt(hit.Object, *point)
+				eye := ray.Direction.Reverse()
+				color := lighting.Lighting(hit.Object.Material, light, *point, *eye, normal)
+
+				canvas.WritePixel(int(pixel.X), int(pixel.Y), color)
 			}
 
 		}
 	}
 
 	canvas.WriteToPPM("circle.ppm")
+
+}
+
+func main() {
+	drawSphereWithLight()
 }
