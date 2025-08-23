@@ -9,7 +9,8 @@ import (
 	"github.com/Naveenaidu/gray/src/lighting"
 	"github.com/Naveenaidu/gray/src/material"
 	"github.com/Naveenaidu/gray/src/rayt"
-	"github.com/Naveenaidu/gray/src/world"
+	"github.com/Naveenaidu/gray/src/rendering"
+	"github.com/Naveenaidu/gray/src/shape"
 )
 
 type Projectile struct {
@@ -28,7 +29,7 @@ func tick(env Environment, proj Projectile) Projectile {
 	return Projectile{*position, *velocity}
 }
 
-func projection(env Environment, proj Projectile, canvas *world.Canvas) Projectile {
+func projection(env Environment, proj Projectile, canvas *rendering.Canvas) Projectile {
 	if proj.position.Y <= 0 {
 		return proj
 	}
@@ -52,7 +53,7 @@ func projection(env Environment, proj Projectile, canvas *world.Canvas) Projecti
 	return projection(env, newproj, canvas)
 }
 
-func ThrowProjectile(env Environment, proj Projectile, canvas *world.Canvas) Projectile {
+func ThrowProjectile(env Environment, proj Projectile, canvas *rendering.Canvas) Projectile {
 	return projection(env, proj, canvas)
 }
 
@@ -76,7 +77,7 @@ func ThrowProjectile(env Environment, proj Projectile, canvas *world.Canvas) Pro
 
 // }
 
-func drawClock(radius float64, canvas *world.Canvas) {
+func drawClock(radius float64, canvas *rendering.Canvas) {
 	// Get the center
 	centerX := canvas.Width / 2
 	centerY := canvas.Height / 2
@@ -118,9 +119,9 @@ func drawClock(radius float64, canvas *world.Canvas) {
 // }
 
 func drawSphereWithLight() {
-	canvas := world.NewCanvas(100, 100, *color.Black)
+	canvas := rendering.NewCanvas(100, 100, *color.Black)
 
-	sphere := material.UnitSphere()
+	sphere := shape.UnitSphere()
 	sphere.Transform = *core.ChainTransforms([]*core.Matrix{
 		core.ScaleM(30, 30, 30),
 		core.TranslationM(50, 50, 0),

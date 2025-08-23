@@ -6,6 +6,7 @@ import (
 	color "github.com/Naveenaidu/gray/src/core/color"
 	core "github.com/Naveenaidu/gray/src/core/math"
 	"github.com/Naveenaidu/gray/src/material"
+	"github.com/Naveenaidu/gray/src/shape"
 )
 
 /*
@@ -14,7 +15,7 @@ To calculate the normal for a sphere at a point, we do the following:
 2. Calculate the normal in object world
 3. Convert the object world normal into world coordinate system
 */
-func NormalAt(s material.Sphere, p core.Point) core.Vector {
+func NormalAt(s shape.Sphere, p core.Point) core.Vector {
 	// FIXME: Check if the transform can be invertible
 	// get the sphere to be at the origin in object world
 	invertTransformM := s.Transform.Inverse()

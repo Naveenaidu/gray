@@ -10,7 +10,8 @@ import (
 	"github.com/Naveenaidu/gray/src/lighting"
 	"github.com/Naveenaidu/gray/src/material"
 	"github.com/Naveenaidu/gray/src/rayt"
-	"github.com/Naveenaidu/gray/src/world"
+	"github.com/Naveenaidu/gray/src/rendering"
+	"github.com/Naveenaidu/gray/src/shape"
 )
 
 func TestAddTuples(t *testing.T) {
@@ -202,7 +203,7 @@ func TestCrossProduct(t *testing.T) {
 /* ------------- Canvas --------------- */
 
 func TestNewCanvas(t *testing.T) {
-	canvas := world.NewCanvas(10, 20, *color.Black)
+	canvas := rendering.NewCanvas(10, 20, *color.Black)
 
 	for x := 0; x < canvas.Width; x++ {
 		for y := 0; y < canvas.Height; y++ {
@@ -214,7 +215,7 @@ func TestNewCanvas(t *testing.T) {
 }
 
 func TestCanvasWritePixel(t *testing.T) {
-	canvas := world.NewCanvas(80, 80, *color.Black)
+	canvas := rendering.NewCanvas(80, 80, *color.Black)
 	canvas.WritePixel(2, 3, *color.Red)
 
 	if canvas.PixelAt(2, 3) != *color.Red {
@@ -1088,7 +1089,7 @@ func TestRayIntersectsSphereAtTwoPoints(t *testing.T) {
 	}
 
 	// And s ← sphere()
-	s := material.UnitSphere()
+	s := shape.UnitSphere()
 
 	// When xs ← intersect(s, r)
 	xs := r.IntersectSphere(*s)
@@ -1118,7 +1119,7 @@ func TestRayIntersectsSphereAtTangent(t *testing.T) {
 	}
 
 	// And s ← sphere()
-	s := material.UnitSphere()
+	s := shape.UnitSphere()
 
 	// When xs ← intersect(s, r)
 	xs := r.IntersectSphere(*s)
@@ -1148,7 +1149,7 @@ func TestRayMissesSphere(t *testing.T) {
 	}
 
 	// And s ← sphere()
-	s := material.UnitSphere()
+	s := shape.UnitSphere()
 
 	// When xs ← intersect(s, r)
 	xs := r.IntersectSphere(*s)
@@ -1168,7 +1169,7 @@ func TestRayOriginatesInsideSphere(t *testing.T) {
 	}
 
 	// And s ← sphere()
-	s := material.UnitSphere()
+	s := shape.UnitSphere()
 
 	// When xs ← intersect(s, r)
 	xs := r.IntersectSphere(*s)
@@ -1198,7 +1199,7 @@ func TestSphereIsBehindRay(t *testing.T) {
 	}
 
 	// And s ← sphere()
-	s := material.UnitSphere()
+	s := shape.UnitSphere()
 
 	// When xs ← intersect(s, r)
 	xs := r.IntersectSphere(*s)
@@ -1220,7 +1221,7 @@ func TestSphereIsBehindRay(t *testing.T) {
 }
 
 func TestHit_AllPositiveT(t *testing.T) {
-	s := material.UnitSphere()
+	s := shape.UnitSphere()
 	i1 := rayt.NewIntersection(1, *s)
 	i2 := rayt.NewIntersection(2, *s)
 	xs := []rayt.Intersection{i2, i1}
@@ -1234,7 +1235,7 @@ func TestHit_AllPositiveT(t *testing.T) {
 }
 
 func TestHit_SomeNegativeT(t *testing.T) {
-	s := material.UnitSphere()
+	s := shape.UnitSphere()
 	i1 := rayt.NewIntersection(-1, *s)
 	i2 := rayt.NewIntersection(1, *s)
 	xs := []rayt.Intersection{i2, i1}
@@ -1248,7 +1249,7 @@ func TestHit_SomeNegativeT(t *testing.T) {
 }
 
 func TestHit_AllNegativeT(t *testing.T) {
-	s := material.UnitSphere()
+	s := shape.UnitSphere()
 	i1 := rayt.NewIntersection(-2, *s)
 	i2 := rayt.NewIntersection(-1, *s)
 	xs := []rayt.Intersection{i2, i1}
@@ -1261,7 +1262,7 @@ func TestHit_AllNegativeT(t *testing.T) {
 }
 
 func TestHit_LowestNonnegativeIntersection(t *testing.T) {
-	s := material.UnitSphere()
+	s := shape.UnitSphere()
 	i1 := rayt.NewIntersection(5, *s)
 	i2 := rayt.NewIntersection(7, *s)
 	i3 := rayt.NewIntersection(-3, *s)
@@ -1325,7 +1326,7 @@ func TestScalingRay(t *testing.T) {
 func TestSphereDefaultTransformation(t *testing.T) {
 	// Scenario: A sphere's default transformation
 	// Given s ← sphere()
-	s := material.UnitSphere()
+	s := shape.UnitSphere()
 	// Then s.transform = identity_matrix
 	if !s.Transform.IsEqual(*core.IdentityMatrix()) {
 		t.Errorf("Expected sphere's default transform to be identity matrix, but got %v", s.Transform.Value)
@@ -1335,7 +1336,7 @@ func TestSphereDefaultTransformation(t *testing.T) {
 func TestChangingSphereTransformation(t *testing.T) {
 	// Scenario: Changing a sphere's transformation
 	// Given s ← sphere()
-	s := material.UnitSphere()
+	s := shape.UnitSphere()
 	// And t ← translation(2, 3, 4)
 	tm := core.TranslationM(2, 3, 4)
 	// When set_transform(s, t)
@@ -1354,7 +1355,7 @@ func TestIntersectingScaledSphereWithRay(t *testing.T) {
 		Direction: *core.NewVector(0, 0, 1),
 	}
 	// And s ← sphere()
-	s := material.UnitSphere()
+	s := shape.UnitSphere()
 	// When set_transform(s, scaling(2, 2, 2))
 	s.Transform = *core.ScaleM(2, 2, 2)
 
@@ -1381,7 +1382,7 @@ func TestIntersectingTranslatedSphereWithRay(t *testing.T) {
 		Direction: *core.NewVector(0, 0, 1),
 	}
 	// And s ← sphere()
-	s := material.UnitSphere()
+	s := shape.UnitSphere()
 	// When set_transform(s, translation(5, 0, 0))
 	s.Transform = *core.TranslationM(5, 0, 0)
 
@@ -1397,7 +1398,7 @@ func TestIntersectingTranslatedSphereWithRay(t *testing.T) {
 func TestSphereNormalAt(t *testing.T) {
 	// Scenario: The normal on a sphere at a point on the x axis
 	// Given s ← sphere()
-	s := material.UnitSphere()
+	s := shape.UnitSphere()
 	// When n ← normal_at(s, point(1, 0, 0))
 	n := lighting.NormalAt(*s, *core.NewPoint(1, 0, 0))
 	// Then n = vector(1, 0, 0)
@@ -1408,7 +1409,7 @@ func TestSphereNormalAt(t *testing.T) {
 
 	// Scenario: The normal on a sphere at a point on the y axis
 	// Given s ← sphere()
-	s = material.UnitSphere()
+	s = shape.UnitSphere()
 	// When n ← normal_at(s, point(0, 1, 0))
 	n = lighting.NormalAt(*s, *core.NewPoint(0, 1, 0))
 	// Then n = vector(0, 1, 0)
@@ -1419,7 +1420,7 @@ func TestSphereNormalAt(t *testing.T) {
 
 	// Scenario: The normal on a sphere at a point on the z axis
 	// Given s ← sphere()
-	s = material.UnitSphere()
+	s = shape.UnitSphere()
 	// When n ← normal_at(s, point(0, 0, 1))
 	n = lighting.NormalAt(*s, *core.NewPoint(0, 0, 1))
 	// Then n = vector(0, 0, 1)
@@ -1430,7 +1431,7 @@ func TestSphereNormalAt(t *testing.T) {
 
 	// Scenario: The normal on a sphere at a nonaxial point
 	// Given s ← sphere()
-	s = material.UnitSphere()
+	s = shape.UnitSphere()
 	// When n ← normal_at(s, point(√3/3, √3/3, √3/3))
 	sqrtThird := math.Sqrt(3) / 3
 	n = lighting.NormalAt(*s, *core.NewPoint(sqrtThird, sqrtThird, sqrtThird))
@@ -1444,7 +1445,7 @@ func TestSphereNormalAt(t *testing.T) {
 func TestSphereNormalIsNormalized(t *testing.T) {
 	// Scenario: The normal is a normalized vector
 	// Given s ← sphere()
-	s := material.UnitSphere()
+	s := shape.UnitSphere()
 	// When n ← normal_at(s, point(√3/3, √3/3, √3/3))
 	sqrtThird := math.Sqrt(3) / 3
 	n := lighting.NormalAt(*s, *core.NewPoint(sqrtThird, sqrtThird, sqrtThird))
@@ -1463,7 +1464,7 @@ func TestSphereNormalIsNormalized(t *testing.T) {
 func TestComputingNormalOnTranslatedSphere(t *testing.T) {
 	// Scenario: Computing the normal on a translated sphere
 	// Given s ← sphere()
-	s := material.UnitSphere()
+	s := shape.UnitSphere()
 	// And set_transform(s, translation(0, 1, 0))
 	s.Transform = *core.ChainTransforms([]*core.Matrix{
 		core.TranslationM(0, 1, 0),
@@ -1480,7 +1481,7 @@ func TestComputingNormalOnTranslatedSphere(t *testing.T) {
 func TestComputingNormalOnTransformedSphere(t *testing.T) {
 	// Scenario: Computing the normal on a transformed sphere
 	// Given s ← sphere()
-	s := material.UnitSphere()
+	s := shape.UnitSphere()
 	// And m ← scaling(1, 0.5, 1) * rotation_z(π/5)
 	// And set_transform(s, m)
 	s.Transform = *core.ChainTransforms([]*core.Matrix{
