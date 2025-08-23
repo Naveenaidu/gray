@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 
+	color "github.com/Naveenaidu/gray/src/core/color"
 	core "github.com/Naveenaidu/gray/src/core/math"
 	"github.com/Naveenaidu/gray/src/lighting"
 	"github.com/Naveenaidu/gray/src/material"
@@ -46,7 +47,7 @@ func projection(env Environment, proj Projectile, canvas *world.Canvas) Projecti
 	fmt.Printf("Projectile Position: %v+\n", newproj.position)
 	fmt.Printf("Projectile canvas Position: %d, %d\n", proj_canvas_x, proj_canvas_y)
 
-	canvas.WritePixel(proj_canvas_x, proj_canvas_y, *world.Red)
+	canvas.WritePixel(proj_canvas_x, proj_canvas_y, *color.Red)
 
 	return projection(env, newproj, canvas)
 }
@@ -81,7 +82,7 @@ func drawClock(radius float64, canvas *world.Canvas) {
 	centerY := canvas.Height / 2
 	center := core.NewPoint(float64(centerX), float64(centerY), 0.0)
 	fmt.Printf("\nCenter point %v+\n", center)
-	canvas.WritePixel(int(center.X), int(center.Y), *world.Green)
+	canvas.WritePixel(int(center.X), int(center.Y), *color.Green)
 
 	/*
 		Learning: To draw a picture of your desire, you compute your drawing
@@ -102,7 +103,7 @@ func drawClock(radius float64, canvas *world.Canvas) {
 		nextHourPointY := (nextHourPoint.Y * radius) + float64(centerY)
 		fmt.Printf("\n next hour point %v %v\n", nextHourPointX, nextHourPointY)
 
-		canvas.WritePixel(int(nextHourPointX), int(nextHourPointY), *world.Red)
+		canvas.WritePixel(int(nextHourPointX), int(nextHourPointY), *color.Red)
 
 		refPointM = nextHourPointM
 	}
@@ -117,7 +118,7 @@ func drawClock(radius float64, canvas *world.Canvas) {
 // }
 
 func drawSphereWithLight() {
-	canvas := world.NewCanvas(100, 100, *world.Black)
+	canvas := world.NewCanvas(100, 100, *color.Black)
 
 	sphere := material.UnitSphere()
 	sphere.Transform = *core.ChainTransforms([]*core.Matrix{
@@ -125,13 +126,13 @@ func drawSphereWithLight() {
 		core.TranslationM(50, 50, 0),
 	})
 	sphere.Material = material.DefaultMaterial()
-	sphere.Material.Color = *world.NewColor(1, 0.2, 1)
+	sphere.Material.Color = *color.NewColor(1, 0.2, 1)
 
 	// assumed ray origin
 	rayOrigin := core.NewPoint(50, 50, 50)
 
 	lightPosition := core.NewPoint(-5, 5, 55)
-	lightColor := world.NewColor(1, 1, 1)
+	lightColor := color.NewColor(1, 1, 1)
 	light := lighting.NewLight(*lightColor, *lightPosition)
 
 	for h := 0; h < canvas.Height; h++ {

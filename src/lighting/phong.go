@@ -3,9 +3,9 @@ package lighting
 import (
 	"math"
 
+	color "github.com/Naveenaidu/gray/src/core/color"
 	core "github.com/Naveenaidu/gray/src/core/math"
 	"github.com/Naveenaidu/gray/src/material"
-	"github.com/Naveenaidu/gray/src/world"
 )
 
 /*
@@ -39,25 +39,25 @@ func Reflect(in core.Vector, normal core.Vector) core.Vector {
 }
 
 type Light struct {
-	Intensity world.Color
+	Intensity color.Color
 	Position  core.Point
 }
 
-func NewLight(intensity world.Color, pos core.Point) Light {
+func NewLight(intensity color.Color, pos core.Point) Light {
 	return Light{intensity, pos}
 }
 
-func Lighting(material material.Material, light Light, point core.Point, eyev core.Vector, normalv core.Vector) world.Color {
+func Lighting(material material.Material, light Light, point core.Point, eyev core.Vector, normalv core.Vector) color.Color {
 	// combine the surface color with the light's color/intensity
-	effectiveColor := world.MultiplyColors([]world.Color{material.Color, light.Intensity})
+	effectiveColor := color.MultiplyColors([]color.Color{material.Color, light.Intensity})
 
 	// find the direction of light source
 	lightV := light.Position.Subtract(point).Normalize()
 
 	// compute the ambient contribution
 	ambient := effectiveColor.ScalarMultiply(material.Ambient)
-	diffuse := world.Black
-	specular := world.Black
+	diffuse := color.Black
+	specular := color.Black
 
 	// light_dot_normal represents the cosine of the angle between the
 	// light vector and the normal vector. A negative number means the
@@ -77,5 +77,5 @@ func Lighting(material material.Material, light Light, point core.Point, eyev co
 		specular = light.Intensity.ScalarMultiply(material.Specular).ScalarMultiply(factor)
 	}
 
-	return *world.AddColors([]world.Color{*ambient, *diffuse, *specular})
+	return *color.AddColors([]color.Color{*ambient, *diffuse, *specular})
 }

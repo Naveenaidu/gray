@@ -5,6 +5,7 @@ import (
 	"math"
 	"testing"
 
+	color "github.com/Naveenaidu/gray/src/core/color"
 	core "github.com/Naveenaidu/gray/src/core/math"
 	"github.com/Naveenaidu/gray/src/lighting"
 	"github.com/Naveenaidu/gray/src/material"
@@ -201,23 +202,23 @@ func TestCrossProduct(t *testing.T) {
 /* ------------- Canvas --------------- */
 
 func TestNewCanvas(t *testing.T) {
-	canvas := world.NewCanvas(10, 20, *world.Black)
+	canvas := world.NewCanvas(10, 20, *color.Black)
 
 	for x := 0; x < canvas.Width; x++ {
 		for y := 0; y < canvas.Height; y++ {
-			if canvas.Color[x][y] != *world.Black {
-				t.Errorf("got: %+v, want: %+v", canvas.Color[x][y], *world.Black)
+			if canvas.Color[x][y] != *color.Black {
+				t.Errorf("got: %+v, want: %+v", canvas.Color[x][y], *color.Black)
 			}
 		}
 	}
 }
 
 func TestCanvasWritePixel(t *testing.T) {
-	canvas := world.NewCanvas(80, 80, *world.Black)
-	canvas.WritePixel(2, 3, *world.Red)
+	canvas := world.NewCanvas(80, 80, *color.Black)
+	canvas.WritePixel(2, 3, *color.Red)
 
-	if canvas.PixelAt(2, 3) != *world.Red {
-		t.Errorf("got: %+v, want: %+v", canvas.PixelAt(2, 3), *world.Red)
+	if canvas.PixelAt(2, 3) != *color.Red {
+		t.Errorf("got: %+v, want: %+v", canvas.PixelAt(2, 3), *color.Red)
 	}
 
 }
@@ -1533,9 +1534,9 @@ func TestLighting(t *testing.T) {
 	// Scenario: Lighting with the eye between the light and the surface
 	eyev := core.NewVector(0, 0, -1)
 	normalv := core.NewVector(0, 0, -1)
-	light := lighting.NewLight(*world.NewColor(1, 1, 1), *core.NewPoint(0, 0, -10))
+	light := lighting.NewLight(*color.NewColor(1, 1, 1), *core.NewPoint(0, 0, -10))
 	result := lighting.Lighting(m, light, *position, *eyev, *normalv)
-	expected := world.NewColor(1.9, 1.9, 1.9)
+	expected := color.NewColor(1.9, 1.9, 1.9)
 	if !result.IsEqual(*expected) {
 		t.Errorf("Expected lighting result = %v, but got %v", expected, result)
 	}
@@ -1544,9 +1545,9 @@ func TestLighting(t *testing.T) {
 	sqrtHalf := math.Sqrt(2) / 2
 	eyev = core.NewVector(0, sqrtHalf, -sqrtHalf)
 	normalv = core.NewVector(0, 0, -1)
-	light = lighting.NewLight(*world.NewColor(1, 1, 1), *core.NewPoint(0, 0, -10))
+	light = lighting.NewLight(*color.NewColor(1, 1, 1), *core.NewPoint(0, 0, -10))
 	result = lighting.Lighting(m, light, *position, *eyev, *normalv)
-	expected = world.NewColor(1.0, 1.0, 1.0)
+	expected = color.NewColor(1.0, 1.0, 1.0)
 	if !result.IsEqual(*expected) {
 		t.Errorf("Expected lighting result = %v, but got %v", expected, result)
 	}
@@ -1554,9 +1555,9 @@ func TestLighting(t *testing.T) {
 	// Scenario: Lighting with eye opposite surface, light offset 45°
 	eyev = core.NewVector(0, 0, -1)
 	normalv = core.NewVector(0, 0, -1)
-	light = lighting.NewLight(*world.NewColor(1, 1, 1), *core.NewPoint(0, 10, -10))
+	light = lighting.NewLight(*color.NewColor(1, 1, 1), *core.NewPoint(0, 10, -10))
 	result = lighting.Lighting(m, light, *position, *eyev, *normalv)
-	expected = world.NewColor(0.7364, 0.7364, 0.7364)
+	expected = color.NewColor(0.7364, 0.7364, 0.7364)
 	if !result.IsEqual(*expected) {
 		t.Errorf("Expected lighting result = %v, but got %v", expected, result)
 	}
@@ -1564,9 +1565,9 @@ func TestLighting(t *testing.T) {
 	// Scenario: Lighting with eye in the path of the reflection vector
 	eyev = core.NewVector(0, -sqrtHalf, -sqrtHalf)
 	normalv = core.NewVector(0, 0, -1)
-	light = lighting.NewLight(*world.NewColor(1, 1, 1), *core.NewPoint(0, 10, -10))
+	light = lighting.NewLight(*color.NewColor(1, 1, 1), *core.NewPoint(0, 10, -10))
 	result = lighting.Lighting(m, light, *position, *eyev, *normalv)
-	expected = world.NewColor(1.6364, 1.6364, 1.6364)
+	expected = color.NewColor(1.6364, 1.6364, 1.6364)
 	if !result.IsEqual(*expected) {
 		t.Errorf("Expected lighting result = %v, but got %v", expected, result)
 	}
@@ -1574,9 +1575,9 @@ func TestLighting(t *testing.T) {
 	// Scenario: Lighting with the light behind the surface
 	eyev = core.NewVector(0, 0, -1)
 	normalv = core.NewVector(0, 0, -1)
-	light = lighting.NewLight(*world.NewColor(1, 1, 1), *core.NewPoint(0, 0, 10))
+	light = lighting.NewLight(*color.NewColor(1, 1, 1), *core.NewPoint(0, 0, 10))
 	result = lighting.Lighting(m, light, *position, *eyev, *normalv)
-	expected = world.NewColor(0.1, 0.1, 0.1)
+	expected = color.NewColor(0.1, 0.1, 0.1)
 	if !result.IsEqual(*expected) {
 		t.Errorf("Expected lighting result = %v, but got %v", expected, result)
 	}

@@ -1,11 +1,11 @@
-package world
+package color
 
 import (
 	core "github.com/Naveenaidu/gray/src/core/math"
 )
 
 type Color struct {
-	r, g, b float64
+	R, G, B float64
 }
 
 var Red = NewColor(1.0, 0.0, 0.0)
@@ -18,20 +18,20 @@ func NewColor(r float64, g float64, b float64) *Color {
 }
 
 func (c1 Color) IsEqual(c2 Color) bool {
-	return core.IsFloatEqual(c1.r, c2.r) &&
-		core.IsFloatEqual(c1.g, c2.g) &&
-		core.IsFloatEqual(c1.b, c2.b)
+	return core.IsFloatEqual(c1.R, c2.R) &&
+		core.IsFloatEqual(c1.G, c2.G) &&
+		core.IsFloatEqual(c1.B, c2.B)
 }
 
-func (c *Color) clamp() *Color {
-	c.r = core.Clamp(c.r)
-	c.g = core.Clamp(c.g)
-	c.b = core.Clamp(c.b)
+func (c *Color) Clamp() *Color {
+	c.R = core.Clamp(c.R)
+	c.G = core.Clamp(c.G)
+	c.B = core.Clamp(c.B)
 	return c
 }
 
 func (c1 Color) add(c2 Color) *Color {
-	return &Color{c1.r + c2.r, c1.g + c2.g, c1.b + c2.b}
+	return &Color{c1.R + c2.R, c1.G + c2.G, c1.B + c2.B}
 }
 
 func AddColors(vlist []Color) *Color {
@@ -43,7 +43,7 @@ func AddColors(vlist []Color) *Color {
 }
 
 func (c1 Color) subtract(c2 Color) *Color {
-	return &Color{c1.r - c2.r, c1.g - c2.g, c1.b - c2.b}
+	return &Color{c1.R - c2.R, c1.G - c2.G, c1.B - c2.B}
 }
 
 func SubtractColors(vlist []Color) *Color {
@@ -55,7 +55,7 @@ func SubtractColors(vlist []Color) *Color {
 }
 
 func (c1 Color) multiply(c2 Color) *Color {
-	return &Color{c1.r * c2.r, c1.g * c2.g, c1.b * c2.b}
+	return &Color{c1.R * c2.R, c1.G * c2.G, c1.B * c2.B}
 }
 
 func MultiplyColors(vlist []Color) *Color {
@@ -67,5 +67,5 @@ func MultiplyColors(vlist []Color) *Color {
 }
 
 func (c1 Color) ScalarMultiply(scalar float64) *Color {
-	return &Color{c1.r * scalar, c1.g * scalar, c1.b * scalar}
+	return &Color{c1.R * scalar, c1.G * scalar, c1.B * scalar}
 }
