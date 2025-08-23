@@ -1,6 +1,8 @@
 package lighting
 
 import (
+	"math"
+
 	"github.com/Naveenaidu/gray/src/geom"
 	"github.com/Naveenaidu/gray/src/material"
 	"github.com/Naveenaidu/gray/src/world"
@@ -43,4 +45,37 @@ type Light struct {
 
 func NewLight(intensity world.Color, pos geom.Point) Light {
 	return Light{intensity, pos}
+}
+
+func Lighting(material material.Material, light Light, point geom.Point, eyev geom.Vector, normalv geom.Vector) world.Color {
+	// combine the surface color with the light's color/intensity
+	effectiveColor := world.MultiplyColors([]world.Color{material.Color, light.Intensity})
+
+	// find the direction of light source
+	lightV := light.Position.Subtract(point).Normalize()
+
+	// compute the ambient contribution
+	ambient := effectiveColor.ScalarMultiply(material.Ambient)
+	diffuse := world.Black
+	specular := world.Black
+
+	// light_dot_normal represents the cosine of the angle between the
+	// light vector and the normal vector. A negative number means the
+	// light is on the other side of the surface.
+	lightDotNormal := lightV.DotProduct(normalv)
+	if lightDotNormal > 0 {
+		diffuse = effectiveColor.ScalarMultiply(material.Diffuse).ScalarMultiply(lightDotNormal)
+	}
+
+	// reflect_dot_eye represents the cosine of the angle between the
+	// reflection vector and the eye vector. A negative number means the
+	// light reflects away from the eye.
+	reflectV := Reflect(*lightV.ScalarMultiply(-1), normalv)
+	reflectDotEye := reflectV.DotProduct(eyev)
+	if reflectDotEye > 0 {
+		factor := math.Pow(reflectDotEye, float64(material.Shininess))
+		specular = light.Intensity.ScalarMultiply(material.Specular).ScalarMultiply(factor)
+	}
+
+	return *world.AddColors([]world.Color{*ambient, *diffuse, *specular})
 }

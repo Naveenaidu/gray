@@ -63,3 +63,7 @@ func MultiplyColors(vlist []Color) *Color {
 	}
 	return &result
 }
+
+func (c1 Color) ScalarMultiply(scalar float64) *Color {
+	return &Color{c1.r * scalar, c1.g * scalar, c1.b * scalar}
+}

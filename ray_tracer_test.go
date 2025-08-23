@@ -1525,3 +1525,60 @@ func TestReflectVector(t *testing.T) {
 		t.Errorf("Expected reflect(v, n) = %v, but got %v", expected, r)
 	}
 }
+
+func TestLighting(t *testing.T) {
+	// Setup common values for all scenarios
+	m := material.DefaultMaterial()
+	position := geom.NewPoint(0, 0, 0)
+
+	// Scenario: Lighting with the eye between the light and the surface
+	eyev := geom.NewVector(0, 0, -1)
+	normalv := geom.NewVector(0, 0, -1)
+	light := lighting.NewLight(*world.NewColor(1, 1, 1), *geom.NewPoint(0, 0, -10))
+	result := lighting.Lighting(m, light, *position, *eyev, *normalv)
+	expected := world.NewColor(1.9, 1.9, 1.9)
+	if !result.IsEqual(*expected) {
+		t.Errorf("Expected lighting result = %v, but got %v", expected, result)
+	}
+
+	// Scenario: Lighting with the eye between light and surface, eye offset 45°
+	sqrtHalf := math.Sqrt(2) / 2
+	eyev = geom.NewVector(0, sqrtHalf, -sqrtHalf)
+	normalv = geom.NewVector(0, 0, -1)
+	light = lighting.NewLight(*world.NewColor(1, 1, 1), *geom.NewPoint(0, 0, -10))
+	result = lighting.Lighting(m, light, *position, *eyev, *normalv)
+	expected = world.NewColor(1.0, 1.0, 1.0)
+	if !result.IsEqual(*expected) {
+		t.Errorf("Expected lighting result = %v, but got %v", expected, result)
+	}
+
+	// Scenario: Lighting with eye opposite surface, light offset 45°
+	eyev = geom.NewVector(0, 0, -1)
+	normalv = geom.NewVector(0, 0, -1)
+	light = lighting.NewLight(*world.NewColor(1, 1, 1), *geom.NewPoint(0, 10, -10))
+	result = lighting.Lighting(m, light, *position, *eyev, *normalv)
+	expected = world.NewColor(0.7364, 0.7364, 0.7364)
+	if !result.IsEqual(*expected) {
+		t.Errorf("Expected lighting result = %v, but got %v", expected, result)
+	}
+
+	// Scenario: Lighting with eye in the path of the reflection vector
+	eyev = geom.NewVector(0, -sqrtHalf, -sqrtHalf)
+	normalv = geom.NewVector(0, 0, -1)
+	light = lighting.NewLight(*world.NewColor(1, 1, 1), *geom.NewPoint(0, 10, -10))
+	result = lighting.Lighting(m, light, *position, *eyev, *normalv)
+	expected = world.NewColor(1.6364, 1.6364, 1.6364)
+	if !result.IsEqual(*expected) {
+		t.Errorf("Expected lighting result = %v, but got %v", expected, result)
+	}
+
+	// Scenario: Lighting with the light behind the surface
+	eyev = geom.NewVector(0, 0, -1)
+	normalv = geom.NewVector(0, 0, -1)
+	light = lighting.NewLight(*world.NewColor(1, 1, 1), *geom.NewPoint(0, 0, 10))
+	result = lighting.Lighting(m, light, *position, *eyev, *normalv)
+	expected = world.NewColor(0.1, 0.1, 0.1)
+	if !result.IsEqual(*expected) {
+		t.Errorf("Expected lighting result = %v, but got %v", expected, result)
+	}
+}
