@@ -1,10 +1,8 @@
-package geom
+package math
 
 import (
 	"fmt"
 	"math"
-
-	"github.com/Naveenaidu/gray/src/util"
 )
 
 type Matrix struct {
@@ -61,7 +59,7 @@ func (m1 Matrix) IsEqual(m2 Matrix) bool {
 
 	for r := 0; r < m1.Rows; r++ {
 		for c := 0; c < m2.Columns; c++ {
-			if !util.IsFloatEqual(m1.Value[r][c], m2.Value[r][c]) {
+			if !IsFloatEqual(m1.Value[r][c], m2.Value[r][c]) {
 				return false
 			}
 		}

@@ -3,7 +3,7 @@ package lighting
 import (
 	"math"
 
-	"github.com/Naveenaidu/gray/src/geom"
+	core "github.com/Naveenaidu/gray/src/core/math"
 	"github.com/Naveenaidu/gray/src/material"
 	"github.com/Naveenaidu/gray/src/world"
 )
@@ -14,12 +14,12 @@ To calculate the normal for a sphere at a point, we do the following:
 2. Calculate the normal in object world
 3. Convert the object world normal into world coordinate system
 */
-func NormalAt(s material.Sphere, p geom.Point) geom.Vector {
+func NormalAt(s material.Sphere, p core.Point) core.Vector {
 	// FIXME: Check if the transform can be invertible
 	// get the sphere to be at the origin in object world
 	invertTransformM := s.Transform.Inverse()
 	objectPoint := invertTransformM.Multiply(*p.ToMatrix()).ToPoint()
-	objectNormal := objectPoint.Subtract(*geom.ObjectOrigin())
+	objectNormal := objectPoint.Subtract(*core.ObjectOrigin())
 	// use transpose of inverse matrix to convert vector in object space to
 	// world space
 	// world_normal ← transpose(inverse(sphere.transform)) * object_normal
@@ -28,10 +28,10 @@ func NormalAt(s material.Sphere, p geom.Point) geom.Vector {
 	return *worldNormal.Normalize()
 }
 
-func Reflect(in geom.Vector, normal geom.Vector) geom.Vector {
+func Reflect(in core.Vector, normal core.Vector) core.Vector {
 	// reflect(in, normal) = in - normal * 2 * dot(in, normal)
 	dotProduct := in.DotProduct(normal)
-	reflection := geom.SubtractVectors([]geom.Vector{
+	reflection := core.SubtractVectors([]core.Vector{
 		in,
 		*normal.ScalarMultiply(2 * dotProduct),
 	})
@@ -40,14 +40,14 @@ func Reflect(in geom.Vector, normal geom.Vector) geom.Vector {
 
 type Light struct {
 	Intensity world.Color
-	Position  geom.Point
+	Position  core.Point
 }
 
-func NewLight(intensity world.Color, pos geom.Point) Light {
+func NewLight(intensity world.Color, pos core.Point) Light {
 	return Light{intensity, pos}
 }
 
-func Lighting(material material.Material, light Light, point geom.Point, eyev geom.Vector, normalv geom.Vector) world.Color {
+func Lighting(material material.Material, light Light, point core.Point, eyev core.Vector, normalv core.Vector) world.Color {
 	// combine the surface color with the light's color/intensity
 	effectiveColor := world.MultiplyColors([]world.Color{material.Color, light.Intensity})
 

@@ -1,9 +1,7 @@
-package geom
+package math
 
 import (
 	"math"
-
-	"github.com/Naveenaidu/gray/src/util"
 )
 
 type Vector struct {
@@ -15,9 +13,9 @@ func NewVector(x float64, y float64, z float64) *Vector {
 }
 
 func (v1 Vector) IsEqual(v2 Vector) bool {
-	return util.IsFloatEqual(v1.X, v2.X) &&
-		util.IsFloatEqual(v1.Y, v2.Y) &&
-		util.IsFloatEqual(v1.Z, v2.Z)
+	return IsFloatEqual(v1.X, v2.X) &&
+		IsFloatEqual(v1.Y, v2.Y) &&
+		IsFloatEqual(v1.Z, v2.Z)
 }
 
 func (v1 Vector) add(v2 Vector) *Vector {

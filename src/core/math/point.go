@@ -1,6 +1,4 @@
-package geom
-
-import "github.com/Naveenaidu/gray/src/util"
+package math
 
 type Point struct {
 	X, Y, Z float64
@@ -15,9 +13,9 @@ func ObjectOrigin() *Point {
 }
 
 func (p1 Point) IsEqual(p2 Point) bool {
-	return util.IsFloatEqual(p1.X, p2.X) &&
-		util.IsFloatEqual(p1.Y, p2.Y) &&
-		util.IsFloatEqual(p1.Z, p2.Z)
+	return IsFloatEqual(p1.X, p2.X) &&
+		IsFloatEqual(p1.Y, p2.Y) &&
+		IsFloatEqual(p1.Z, p2.Z)
 }
 
 func (p1 Point) AddVector(v1 Vector) *Point {

@@ -1,20 +1,22 @@
 package material
 
-import "github.com/Naveenaidu/gray/src/geom"
+import (
+	core "github.com/Naveenaidu/gray/src/core/math"
+)
 
 type Sphere struct {
-	Center    geom.Point
+	Center    core.Point
 	Radius    float64
-	Transform geom.Matrix
+	Transform core.Matrix
 	Material  Material
 }
 
 // Sphere with radius 1 and centered at origin (0,0,0)
 func UnitSphere() *Sphere {
 	return &Sphere{
-		Center:    *geom.NewPoint(0, 0, 0),
+		Center:    *core.NewPoint(0, 0, 0),
 		Radius:    1.0,
-		Transform: *geom.IdentityMatrix(),
+		Transform: *core.IdentityMatrix(),
 		Material:  DefaultMaterial(),
 	}
 }

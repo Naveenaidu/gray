@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/Naveenaidu/gray/src/geom"
+	core "github.com/Naveenaidu/gray/src/core/math"
 	"github.com/Naveenaidu/gray/src/lighting"
 	"github.com/Naveenaidu/gray/src/material"
 	"github.com/Naveenaidu/gray/src/rayt"
@@ -12,18 +12,18 @@ import (
 )
 
 type Projectile struct {
-	position geom.Point
-	velocity geom.Vector
+	position core.Point
+	velocity core.Vector
 }
 
 type Environment struct {
-	gravity geom.Vector
-	wind    geom.Vector
+	gravity core.Vector
+	wind    core.Vector
 }
 
 func tick(env Environment, proj Projectile) Projectile {
 	position := proj.position.AddVector(proj.velocity)
-	velocity := geom.AddVectors([]geom.Vector{proj.velocity, env.gravity, env.wind})
+	velocity := core.AddVectors([]core.Vector{proj.velocity, env.gravity, env.wind})
 	return Projectile{*position, *velocity}
 }
 
@@ -79,7 +79,7 @@ func drawClock(radius float64, canvas *world.Canvas) {
 	// Get the center
 	centerX := canvas.Width / 2
 	centerY := canvas.Height / 2
-	center := geom.NewPoint(float64(centerX), float64(centerY), 0.0)
+	center := core.NewPoint(float64(centerX), float64(centerY), 0.0)
 	fmt.Printf("\nCenter point %v+\n", center)
 	canvas.WritePixel(int(center.X), int(center.Y), *world.Green)
 
@@ -88,11 +88,11 @@ func drawClock(radius float64, canvas *world.Canvas) {
 		from your imagined origin taking unit points as reference and then
 		compute the points to match your canvas dimensions
 	*/
-	refPointM := geom.NewPoint(0, 1, 0).ToMatrix()
-	hourRotateM := geom.RotateZM(math.Pi / 6)
+	refPointM := core.NewPoint(0, 1, 0).ToMatrix()
+	hourRotateM := core.RotateZM(math.Pi / 6)
 	for h := 0; h <= 11; h++ {
 		// Rotate the previous hour point by pi/6
-		nextHourPointM := geom.ChainTransforms([]*geom.Matrix{refPointM, hourRotateM})
+		nextHourPointM := core.ChainTransforms([]*core.Matrix{refPointM, hourRotateM})
 		nextHourPoint := nextHourPointM.ToPoint()
 		fmt.Printf("\n %d hour point %v", h+1, nextHourPoint)
 		// canvas.WritePixel(int(nextHourPoint.X), int(nextHourPoint.Y), *Red)
@@ -120,23 +120,23 @@ func drawSphereWithLight() {
 	canvas := world.NewCanvas(100, 100, *world.Black)
 
 	sphere := material.UnitSphere()
-	sphere.Transform = *geom.ChainTransforms([]*geom.Matrix{
-		geom.ScaleM(30, 30, 30),
-		geom.TranslationM(50, 50, 0),
+	sphere.Transform = *core.ChainTransforms([]*core.Matrix{
+		core.ScaleM(30, 30, 30),
+		core.TranslationM(50, 50, 0),
 	})
 	sphere.Material = material.DefaultMaterial()
 	sphere.Material.Color = *world.NewColor(1, 0.2, 1)
 
 	// assumed ray origin
-	rayOrigin := geom.NewPoint(50, 50, 50)
+	rayOrigin := core.NewPoint(50, 50, 50)
 
-	lightPosition := geom.NewPoint(-5, 5, 55)
+	lightPosition := core.NewPoint(-5, 5, 55)
 	lightColor := world.NewColor(1, 1, 1)
 	light := lighting.NewLight(*lightColor, *lightPosition)
 
 	for h := 0; h < canvas.Height; h++ {
 		for w := 0; w < canvas.Width; w++ {
-			pixel := geom.NewPoint(float64(w), float64(h), 0.0)
+			pixel := core.NewPoint(float64(w), float64(h), 0.0)
 			rayDirection := pixel.Subtract(*rayOrigin).Normalize()
 			ray := rayt.Ray{Origin: *rayOrigin, Direction: *rayDirection}
 

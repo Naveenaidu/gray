@@ -1,6 +1,8 @@
 package world
 
-import "github.com/Naveenaidu/gray/src/util"
+import (
+	core "github.com/Naveenaidu/gray/src/core/math"
+)
 
 type Color struct {
 	r, g, b float64
@@ -16,15 +18,15 @@ func NewColor(r float64, g float64, b float64) *Color {
 }
 
 func (c1 Color) IsEqual(c2 Color) bool {
-	return util.IsFloatEqual(c1.r, c2.r) &&
-		util.IsFloatEqual(c1.g, c2.g) &&
-		util.IsFloatEqual(c1.b, c2.b)
+	return core.IsFloatEqual(c1.r, c2.r) &&
+		core.IsFloatEqual(c1.g, c2.g) &&
+		core.IsFloatEqual(c1.b, c2.b)
 }
 
 func (c *Color) clamp() *Color {
-	c.r = util.Clamp(c.r)
-	c.g = util.Clamp(c.g)
-	c.b = util.Clamp(c.b)
+	c.r = core.Clamp(c.r)
+	c.g = core.Clamp(c.g)
+	c.b = core.Clamp(c.b)
 	return c
 }
 

@@ -4,13 +4,13 @@ import (
 	"math"
 	"sort"
 
-	"github.com/Naveenaidu/gray/src/geom"
+	core "github.com/Naveenaidu/gray/src/core/math"
 	"github.com/Naveenaidu/gray/src/material"
 )
 
 type Ray struct {
-	Origin    geom.Point
-	Direction geom.Vector
+	Origin    core.Point
+	Direction core.Vector
 }
 
 // TODO: Should "Intersection" be part of Ray struct
@@ -23,7 +23,7 @@ func NewIntersection(t float64, obj material.Sphere) Intersection {
 	return Intersection{T: t, Object: obj}
 }
 
-func (r Ray) Position(t float64) *geom.Point {
+func (r Ray) Position(t float64) *core.Point {
 	// newPosition = r.origin + r.direction * t
 	// The new point that lies at the distance "t" along the ray
 	newPosition := r.Origin.AddVector(*r.Direction.ScalarMultiply(t))
@@ -82,9 +82,9 @@ func (r Ray) Hit(intersections []Intersection) *Intersection {
 
 }
 
-func (r Ray) Transform(m *geom.Matrix) Ray {
-	transformedRayPointM := geom.ChainTransforms([]*geom.Matrix{r.Origin.ToMatrix(), m})
-	transformedDirectionM := geom.ChainTransforms([]*geom.Matrix{r.Direction.ToMatrix(), m})
+func (r Ray) Transform(m *core.Matrix) Ray {
+	transformedRayPointM := core.ChainTransforms([]*core.Matrix{r.Origin.ToMatrix(), m})
+	transformedDirectionM := core.ChainTransforms([]*core.Matrix{r.Direction.ToMatrix(), m})
 	return Ray{
 		Origin: *transformedRayPointM.ToPoint(),
 		// Direction: r.Direction,
