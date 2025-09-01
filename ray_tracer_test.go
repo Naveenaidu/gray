@@ -11,6 +11,7 @@ import (
 	"github.com/Naveenaidu/gray/src/material"
 	"github.com/Naveenaidu/gray/src/rayt"
 	"github.com/Naveenaidu/gray/src/rendering"
+	"github.com/Naveenaidu/gray/src/scene"
 	"github.com/Naveenaidu/gray/src/shape"
 )
 
@@ -1581,5 +1582,46 @@ func TestLighting(t *testing.T) {
 	expected = color.NewColor(0.1, 0.1, 0.1)
 	if !result.IsEqual(*expected) {
 		t.Errorf("Expected lighting result = %v, but got %v", expected, result)
+	}
+}
+
+/* ------------- Making a scene --------------- */
+func TestIntersectWorldWithRay(t *testing.T) {
+	// Scenario: Intersect a world with a ray
+	// Given w ← default_world()
+	w := scene.DefaultWorld()
+
+	// And r ← ray(point(0, 0, -5), vector(0, 0, 1))
+	r := rayt.Ray{
+		Origin:    *core.NewPoint(0, 0, -5),
+		Direction: *core.NewVector(0, 0, 1),
+	}
+
+	// When xs ← intersect_world(w, r)
+	xs := scene.IntersectWorld(r, *w)
+
+	// Then xs.count = 4
+	if len(xs) != 4 {
+		t.Errorf("Expected xs.count = 4, but got %d", len(xs))
+	}
+
+	// And xs[0].t = 4
+	if !core.IsFloatEqual(xs[0].T, 4.0) {
+		t.Errorf("Expected xs[0].t = 4, but got %v", xs[0].T)
+	}
+
+	// And xs[1].t = 4.5
+	if !core.IsFloatEqual(xs[1].T, 4.5) {
+		t.Errorf("Expected xs[1].t = 4.5, but got %v", xs[1].T)
+	}
+
+	// And xs[2].t = 5.5
+	if !core.IsFloatEqual(xs[2].T, 5.5) {
+		t.Errorf("Expected xs[2].t = 5.5, but got %v", xs[2].T)
+	}
+
+	// And xs[3].t = 6
+	if !core.IsFloatEqual(xs[3].T, 6.0) {
+		t.Errorf("Expected xs[3].t = 6, but got %v", xs[3].T)
 	}
 }

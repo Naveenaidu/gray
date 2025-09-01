@@ -1,10 +1,13 @@
 package scene
 
 import (
+	"sort"
+
 	"github.com/Naveenaidu/gray/src/core/color"
 	"github.com/Naveenaidu/gray/src/core/math"
 	"github.com/Naveenaidu/gray/src/lighting"
 	"github.com/Naveenaidu/gray/src/material"
+	"github.com/Naveenaidu/gray/src/rayt"
 	"github.com/Naveenaidu/gray/src/shape"
 )
 
@@ -33,5 +36,20 @@ func DefaultWorld() *World {
 	spheres := []shape.Sphere{*s1, *s2}
 
 	return &World{Light: pointLight, Spheres: spheres}
+}
+
+func IntersectWorld(ray rayt.Ray, world World) []rayt.Intersection {
+	xs := []rayt.Intersection{}
+
+	for _, s := range world.Spheres {
+		sIntersections := ray.IntersectSphere(s)
+		xs = append(xs, sIntersections...)
+	}
+
+	sort.Slice(xs, func(i, j int) bool {
+		return xs[i].T < xs[j].T
+	})
+
+	return xs
 
 }
