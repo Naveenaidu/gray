@@ -1598,7 +1598,7 @@ func TestIntersectWorldWithRay(t *testing.T) {
 	}
 
 	// When xs ← intersect_world(w, r)
-	xs := scene.IntersectWorld(r, *w)
+	xs := scene.IntersectWorld(*w, r)
 
 	// Then xs.count = 4
 	if len(xs) != 4 {
@@ -1740,5 +1740,76 @@ func TestShadeHit_IntersectionFromInside(t *testing.T) {
 	expected := color.NewColor(0.90498, 0.90498, 0.90498)
 	if !c.IsEqual(*expected) {
 		t.Errorf("Expected shade_hit result = %v, but got %v", expected, c)
+	}
+}
+
+func TestColorAt_RayMisses(t *testing.T) {
+	// Scenario: The color when a ray misses
+	// Given w ← default_world()
+	w := scene.DefaultWorld()
+
+	// And r ← ray(point(0, 0, -5), vector(0, 1, 0))
+	r := rayt.Ray{
+		Origin:    *core.NewPoint(0, 0, -5),
+		Direction: *core.NewVector(0, 1, 0),
+	}
+
+	// When c ← color_at(w, r)
+	c := scene.ColorAt(*w, r)
+
+	// Then c = color(0, 0, 0)
+	expected := color.NewColor(0, 0, 0)
+	if !c.IsEqual(*expected) {
+		t.Errorf("Expected color_at result = %v, but got %v", expected, c)
+	}
+}
+
+func TestColorAt_RayHits(t *testing.T) {
+	// Scenario: The color when a ray hits
+	// Given w ← default_world()
+	w := scene.DefaultWorld()
+
+	// And r ← ray(point(0, 0, -5), vector(0, 0, 1))
+	r := rayt.Ray{
+		Origin:    *core.NewPoint(0, 0, -5),
+		Direction: *core.NewVector(0, 0, 1),
+	}
+
+	// When c ← color_at(w, r)
+	c := scene.ColorAt(*w, r)
+
+	// Then c = color(0.38066, 0.47583, 0.2855)
+	expected := color.NewColor(0.38066, 0.47583, 0.2855)
+	if !c.IsEqual(*expected) {
+		t.Errorf("Expected color_at result = %v, but got %v", expected, c)
+	}
+}
+
+func TestColorAt_IntersectionBehindRay(t *testing.T) {
+	// Scenario: The color with an intersection behind the ray
+	// Given w ← default_world()
+	w := scene.DefaultWorld()
+
+	// And outer ← the first object in w
+	// And outer.material.ambient ← 1
+	w.Spheres[0].Material.Ambient = 1
+
+	// And inner ← the second object in w
+	// And inner.material.ambient ← 1
+	w.Spheres[1].Material.Ambient = 1
+
+	// And r ← ray(point(0, 0, 0.75), vector(0, 0, -1))
+	r := rayt.Ray{
+		Origin:    *core.NewPoint(0, 0, 0.75),
+		Direction: *core.NewVector(0, 0, -1),
+	}
+
+	// When c ← color_at(w, r)
+	c := scene.ColorAt(*w, r)
+
+	// Then c = inner.material.color
+	expected := w.Spheres[1].Material.Color
+	if !c.IsEqual(expected) {
+		t.Errorf("Expected color_at result = %v, but got %v", expected, c)
 	}
 }

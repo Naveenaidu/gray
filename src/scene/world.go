@@ -47,7 +47,7 @@ func DefaultWorld() *World {
 	return &World{Light: pointLight, Spheres: spheres}
 }
 
-func IntersectWorld(ray rayt.Ray, world World) []rayt.Intersection {
+func IntersectWorld(world World, ray rayt.Ray) []rayt.Intersection {
 	xs := []rayt.Intersection{}
 
 	for _, s := range world.Spheres {
@@ -89,4 +89,19 @@ func PrepareComputations(intersection rayt.Intersection, ray rayt.Ray) *Computat
 
 func ShadeHit(world World, comps Computation) color.Color {
 	return lighting.Lighting(comps.Object.Material, world.Light, comps.Point, comps.EyeV, comps.NormalV)
+}
+
+func ColorAt(world World, ray rayt.Ray) color.Color {
+	color := color.Black
+	intrs := IntersectWorld(world, ray)
+
+	hit := ray.Hit(intrs)
+	if hit == nil {
+		return *color
+	}
+	comps := PrepareComputations(*hit, ray)
+	hitColor := ShadeHit(world, *comps)
+
+	return hitColor
+
 }
