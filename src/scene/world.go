@@ -16,6 +16,15 @@ type World struct {
 	Spheres []shape.Sphere
 }
 
+type Computation struct {
+	T       float64
+	Object  shape.Sphere
+	Point   math.Point
+	EyeV    math.Vector
+	NormalV math.Vector
+	Inside  bool
+}
+
 func DefaultWorld() *World {
 	pointLight := lighting.NewLight(*color.NewColor(1, 1, 1), *math.NewPoint(-10, 10, -10))
 
@@ -52,4 +61,28 @@ func IntersectWorld(ray rayt.Ray, world World) []rayt.Intersection {
 
 	return xs
 
+}
+
+func PrepareComputations(intersection rayt.Intersection, ray rayt.Ray) *Computation {
+	point := ray.Position(intersection.T)
+	eyev := ray.Direction.Negate()
+	normalV := lighting.NormalAt(intersection.Object, *point)
+	inside := false
+
+	// check if the ray is originating from inside of the sphere. If the eye
+	// vector and the normal vector are in opposite direction than the ray is
+	// originating from inside of sphere
+	if normalV.DotProduct(*eyev) < 0 {
+		inside = true
+		normalV = *normalV.Negate()
+	}
+
+	return &Computation{
+		T:       intersection.T,
+		Object:  intersection.Object,
+		Point:   *point,
+		EyeV:    *eyev,
+		NormalV: normalV,
+		Inside:  inside,
+	}
 }

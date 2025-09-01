@@ -1625,3 +1625,57 @@ func TestIntersectWorldWithRay(t *testing.T) {
 		t.Errorf("Expected xs[3].t = 6, but got %v", xs[3].T)
 	}
 }
+
+func TestPrepareComputations_IntersectionOnOutside(t *testing.T) {
+	// Scenario: The hit, when an intersection occurs on the outside
+	// Given r ← ray(point(0, 0, -5), vector(0, 0, 1))
+	r := rayt.Ray{
+		Origin:    *core.NewPoint(0, 0, -5),
+		Direction: *core.NewVector(0, 0, 1),
+	}
+	// And shape ← sphere()
+	shape := shape.UnitSphere()
+	// And i ← intersection(4, shape)
+	i := rayt.NewIntersection(4, *shape)
+	// When comps ← prepare_computations(i, r)
+	comps := scene.PrepareComputations(i, r)
+	// Then comps.inside = false
+	if comps.Inside != false {
+		t.Errorf("Expected comps.inside = false, but got %v", comps.Inside)
+	}
+}
+
+func TestPrepareComputations_IntersectionOnInside(t *testing.T) {
+	// Scenario: The hit, when an intersection occurs on the inside
+	// Given r ← ray(point(0, 0, 0), vector(0, 0, 1))
+	r := rayt.Ray{
+		Origin:    *core.NewPoint(0, 0, 0),
+		Direction: *core.NewVector(0, 0, 1),
+	}
+	// And shape ← sphere()
+	shape := shape.UnitSphere()
+	// And i ← intersection(1, shape)
+	i := rayt.NewIntersection(1, *shape)
+	// When comps ← prepare_computations(i, r)
+	comps := scene.PrepareComputations(i, r)
+	// Then comps.point = point(0, 0, 1)
+	expectedPoint := core.NewPoint(0, 0, 1)
+	if !comps.Point.IsEqual(*expectedPoint) {
+		t.Errorf("Expected comps.point = %v, but got %v", expectedPoint, comps.Point)
+	}
+	// And comps.eyev = vector(0, 0, -1)
+	expectedEyev := core.NewVector(0, 0, -1)
+	if !comps.EyeV.IsEqual(*expectedEyev) {
+		t.Errorf("Expected comps.eyev = %v, but got %v", expectedEyev, comps.EyeV)
+	}
+	// And comps.inside = true
+	if comps.Inside != true {
+		t.Errorf("Expected comps.inside = true, but got %v", comps.Inside)
+	}
+	// # normal would have been (0, 0, 1), but is inverted!
+	// And comps.normalv = vector(0, 0, -1)
+	expectedNormalv := core.NewVector(0, 0, -1)
+	if !comps.NormalV.IsEqual(*expectedNormalv) {
+		t.Errorf("Expected comps.normalv = %v, but got %v", expectedNormalv, comps.NormalV)
+	}
+}
