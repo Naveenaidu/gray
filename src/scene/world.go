@@ -86,3 +86,7 @@ func PrepareComputations(intersection rayt.Intersection, ray rayt.Ray) *Computat
 		Inside:  inside,
 	}
 }
+
+func ShadeHit(world World, comps Computation) color.Color {
+	return lighting.Lighting(comps.Object.Material, world.Light, comps.Point, comps.EyeV, comps.NormalV)
+}

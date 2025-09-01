@@ -1679,3 +1679,66 @@ func TestPrepareComputations_IntersectionOnInside(t *testing.T) {
 		t.Errorf("Expected comps.normalv = %v, but got %v", expectedNormalv, comps.NormalV)
 	}
 }
+
+func TestShadeHit_Intersection(t *testing.T) {
+	// Scenario: Shading an intersection
+	// Given w ← default_world()
+	w := scene.DefaultWorld()
+
+	// And r ← ray(point(0, 0, -5), vector(0, 0, 1))
+	r := rayt.Ray{
+		Origin:    *core.NewPoint(0, 0, -5),
+		Direction: *core.NewVector(0, 0, 1),
+	}
+
+	// And shape ← the first object in w
+	shape := w.Spheres[0]
+
+	// And i ← intersection(4, shape)
+	i := rayt.NewIntersection(4, shape)
+
+	// When comps ← prepare_computations(i, r)
+	comps := scene.PrepareComputations(i, r)
+
+	// And c ← shade_hit(w, comps)
+	c := scene.ShadeHit(*w, *comps)
+
+	// Then c = color(0.38066, 0.47583, 0.2855)
+	expected := color.NewColor(0.38066, 0.47583, 0.2855)
+	if !c.IsEqual(*expected) {
+		t.Errorf("Expected shade_hit result = %v, but got %v", expected, c)
+	}
+}
+
+func TestShadeHit_IntersectionFromInside(t *testing.T) {
+	// Scenario: Shading an intersection from the inside
+	// Given w ← default_world()
+	w := scene.DefaultWorld()
+
+	// And w.light ← point_light(point(0, 0.25, 0), color(1, 1, 1))
+	w.Light = lighting.NewLight(*color.NewColor(1, 1, 1), *core.NewPoint(0, 0.25, 0))
+
+	// And r ← ray(point(0, 0, 0), vector(0, 0, 1))
+	r := rayt.Ray{
+		Origin:    *core.NewPoint(0, 0, 0),
+		Direction: *core.NewVector(0, 0, 1),
+	}
+
+	// And shape ← the second object in w
+	shape := w.Spheres[1]
+
+	// And i ← intersection(0.5, shape)
+	i := rayt.NewIntersection(0.5, shape)
+
+	// When comps ← prepare_computations(i, r)
+	comps := scene.PrepareComputations(i, r)
+
+	// And c ← shade_hit(w, comps)
+	c := scene.ShadeHit(*w, *comps)
+
+	// Then c = color(0.90498, 0.90498, 0.90498)
+	expected := color.NewColor(0.90498, 0.90498, 0.90498)
+	if !c.IsEqual(*expected) {
+		t.Errorf("Expected shade_hit result = %v, but got %v", expected, c)
+	}
+}
