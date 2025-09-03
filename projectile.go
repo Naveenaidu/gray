@@ -118,6 +118,7 @@ func drawClock(radius float64, canvas *rendering.Canvas) {
 // 	canvas.WriteToPPM("clock.ppm")
 // }
 
+// TODO: Update code to reflect the one in the textbook?
 func drawSphereWithLight() {
 	canvas := rendering.NewCanvas(100, 100, *color.Black)
 
