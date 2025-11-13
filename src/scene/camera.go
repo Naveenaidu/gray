@@ -20,3 +20,23 @@ func ViewTransform(from math.Point, to math.Point, up math.Vector) *math.Matrix 
 	translationM := math.TranslationM(-from.X, -from.Y, -from.Z)
 	return orientation.Multiply(*translationM)
 }
+
+type Camera struct {
+	// horizontal size (in pixels) of the canvas that the picture will be rendered to
+	Hsize int
+	// canvas vertical size (in pixels)
+	Vsize int
+	// angle that describes how much the camera can see
+	FieldOfView float64
+	// matrix representing how the world should be oriented relative to the camera
+	Transform math.Matrix
+}
+
+func NewCamera(hsize int, vsize int, fieldOfView float64) *Camera {
+	return &Camera{
+		Hsize:       hsize,
+		Vsize:       vsize,
+		FieldOfView: fieldOfView,
+		Transform:   *math.IdentityMatrix(),
+	}
+}
