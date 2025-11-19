@@ -1869,3 +1869,85 @@ func TestViewTransform_ArbitraryTransformation(t *testing.T) {
 		t.Errorf("Expected view_transform matrix:\n%v\nbut got:\n%v", expected.Value, transform.Value)
 	}
 }
+
+func TestCameraPixelSize_HorizontalCanvas(t *testing.T) {
+	// Scenario: The pixel size for a horizontal canvas
+	// Given c ← camera(200, 125, π/2)
+	c := scene.NewCamera(200, 125, math.Pi/2)
+	// Then c.pixel_size = 0.01
+	expectedPixelSize := 0.01
+	if !core.IsFloatEqual(c.PixelSize, expectedPixelSize) {
+		t.Errorf("Expected c.pixel_size = %v, but got %v", expectedPixelSize, c.PixelSize)
+	}
+}
+
+func TestCameraPixelSize_VerticalCanvas(t *testing.T) {
+	// Scenario: The pixel size for a vertical canvas
+	// Given c ← camera(125, 200, π/2)
+	c := scene.NewCamera(125, 200, math.Pi/2)
+	// Then c.pixel_size = 0.01
+	expectedPixelSize := 0.01
+	if !core.IsFloatEqual(c.PixelSize, expectedPixelSize) {
+		t.Errorf("Expected c.pixel_size = %v, but got %v", expectedPixelSize, c.PixelSize)
+	}
+}
+
+func TestRayForPixel_CenterOfCanvas(t *testing.T) {
+	// Scenario: Constructing a ray through the center of the canvas
+	// Given c ← camera(201, 101, π/2)
+	c := scene.NewCamera(201, 101, math.Pi/2)
+	// When r ← ray_for_pixel(c, 100, 50)
+	r := scene.RayForPixel(*c, 100, 50)
+	// Then r.origin = point(0, 0, 0)
+	expectedOrigin := core.NewPoint(0, 0, 0)
+	if !r.Origin.IsEqual(*expectedOrigin) {
+		t.Errorf("Expected r.origin = %v, but got %v", expectedOrigin, r.Origin)
+	}
+	// And r.direction = vector(0, 0, -1)
+	expectedDirection := core.NewVector(0, 0, -1)
+	if !r.Direction.IsEqual(*expectedDirection) {
+		t.Errorf("Expected r.direction = %v, but got %v", expectedDirection, r.Direction)
+	}
+}
+
+func TestRayForPixel_CornerOfCanvas(t *testing.T) {
+	// Scenario: Constructing a ray through a corner of the canvas
+	// Given c ← camera(201, 101, π/2)
+	c := scene.NewCamera(201, 101, math.Pi/2)
+	// When r ← ray_for_pixel(c, 0, 0)
+	r := scene.RayForPixel(*c, 0, 0)
+	// Then r.origin = point(0, 0, 0)
+	expectedOrigin := core.NewPoint(0, 0, 0)
+	if !r.Origin.IsEqual(*expectedOrigin) {
+		t.Errorf("Expected r.origin = %v, but got %v", expectedOrigin, r.Origin)
+	}
+	// And r.direction = vector(0.66519, 0.33259, -0.66851)
+	expectedDirection := core.NewVector(0.66519, 0.33259, -0.66851)
+	if !r.Direction.IsEqual(*expectedDirection) {
+		t.Errorf("Expected r.direction = %v, but got %v", expectedDirection, r.Direction)
+	}
+}
+
+func TestRayForPixel_TransformedCamera(t *testing.T) {
+	// Scenario: Constructing a ray when the camera is transformed
+	// Given c ← camera(201, 101, π/2)
+	c := scene.NewCamera(201, 101, math.Pi/2)
+	// When c.transform ← rotation_y(π/4) * translation(0, -2, 5)
+	c.Transform = *core.ChainTransforms([]*core.Matrix{
+		core.TranslationM(0, -2, 5),
+		core.RotateYM(math.Pi / 4),
+	})
+	// And r ← ray_for_pixel(c, 100, 50)
+	r := scene.RayForPixel(*c, 100, 50)
+	// Then r.origin = point(0, 2, -5)
+	expectedOrigin := core.NewPoint(0, 2, -5)
+	if !r.Origin.IsEqual(*expectedOrigin) {
+		t.Errorf("Expected r.origin = %v, but got %v", expectedOrigin, r.Origin)
+	}
+	// And r.direction = vector(√2/2, 0, -√2/2)
+	sqrtHalf := math.Sqrt(2) / 2
+	expectedDirection := core.NewVector(sqrtHalf, 0, -sqrtHalf)
+	if !r.Direction.IsEqual(*expectedDirection) {
+		t.Errorf("Expected r.direction = %v, but got %v", expectedDirection, r.Direction)
+	}
+}

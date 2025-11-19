@@ -1,9 +1,11 @@
 package scene
 
 import (
+	"fmt"
 	"math"
 
 	coreMath "github.com/Naveenaidu/gray/src/core/math"
+	"github.com/Naveenaidu/gray/src/rayt"
 )
 
 // transformation matrix that orients the world relative to the eye
@@ -42,19 +44,23 @@ type Camera struct {
 
 func NewCamera(hsize int, vsize int, fieldOfView float64) *Camera {
 
+	var aspect, halfWidth, halfHeight float64
 	// calculate the pixel size
 	halfView := math.Tan(fieldOfView / 2)
-	aspect := hsize / vsize
+	aspect = float64(hsize) / float64(vsize)
 
-	var halfWidth, halfHeight float64
-
-	if aspect >= 1 {
+	if aspect >= 1.0 {
 		halfWidth = halfView
 		halfHeight = halfView / float64(aspect)
 	} else {
 		halfWidth = halfView * float64(aspect)
 		halfHeight = halfView
 	}
+
+	fmt.Printf("halfView %v\n", halfView)
+	fmt.Printf("aspect %v\n", aspect)
+	fmt.Printf("halfWidth %v\n", halfWidth)
+	fmt.Printf("halfHeight %v\n", halfHeight)
 
 	pixelSize := halfWidth * 2 / float64(hsize)
 
@@ -67,4 +73,33 @@ func NewCamera(hsize int, vsize int, fieldOfView float64) *Camera {
 		HalfWidth:   halfWidth,
 		halfHeight:  halfHeight,
 	}
+}
+
+// Compute the world cooridates at the center of given pixel
+func RayForPixel(camera Camera, px float64, py float64) *rayt.Ray {
+	// offset from edge of canvas to the pixel center
+	xOffset := (px + 0.5) * camera.PixelSize
+	yOffset := (py + 0.5) * camera.PixelSize
+
+	// untransformed coordinates of pixel in the worl space
+	// (camera looks towards -z, so +x is to the left) i.e
+	//		Positive X is to the left. and Positive Y is to the upwards
+	worldX := camera.HalfWidth - xOffset
+	worldY := camera.halfHeight - yOffset
+
+	// The "transform" field of camera tells, how the camera looks at the world,
+	// but we need the inverse, i.e how is the world looking at camera.
+	// Transform the coordinates from camera to world.
+	// (note camera is at z=-1)
+
+	// pixel ← inverse(camera.transform) * point(world_x, world_y, -1)
+	untransformedPixel := coreMath.NewPoint(worldX, worldY, -1)
+	pixel := camera.Transform.Inverse().Multiply(*untransformedPixel.ToMatrix()).ToPoint()
+
+	// origin ← inverse(camera.transform) * point(0, 0, 0)
+	origin := camera.Transform.Inverse().Multiply(*coreMath.ObjectOrigin().ToMatrix()).ToPoint()
+
+	direction := pixel.Subtract(*origin).Normalize()
+
+	return &rayt.Ray{Origin: *origin, Direction: *direction}
 }
