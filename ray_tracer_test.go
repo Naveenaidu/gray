@@ -1951,3 +1951,34 @@ func TestRayForPixel_TransformedCamera(t *testing.T) {
 		t.Errorf("Expected r.direction = %v, but got %v", expectedDirection, r.Direction)
 	}
 }
+
+func TestRenderingWorldWithCamera(t *testing.T) {
+	// Scenario: Rendering a world with a camera
+	// Given w ← default_world()
+	w := scene.DefaultWorld()
+
+	// And c ← camera(11, 11, π/2)
+	c := scene.NewCamera(11, 11, math.Pi/2)
+
+	// And from ← point(0, 0, -5)
+	from := core.NewPoint(0, 0, -5)
+
+	// And to ← point(0, 0, 0)
+	to := core.NewPoint(0, 0, 0)
+
+	// And up ← vector(0, 1, 0)
+	up := core.NewVector(0, 1, 0)
+
+	// And c.transform ← view_transform(from, to, up)
+	c.Transform = *scene.ViewTransform(*from, *to, *up)
+
+	// When image ← render(c, w)
+	image := scene.Render(*c, *w)
+
+	// Then pixel_at(image, 5, 5) = color(0.38066, 0.47583, 0.2855)
+	expected := color.NewColor(0.38066, 0.47583, 0.2855)
+	pixel := image.PixelAt(5, 5)
+	if !pixel.IsEqual(*expected) {
+		t.Errorf("Expected pixel_at(image, 5, 5) = %v, but got %v", expected, pixel)
+	}
+}

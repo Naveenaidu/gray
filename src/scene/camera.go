@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"math"
 
+	"github.com/Naveenaidu/gray/src/core/color"
 	coreMath "github.com/Naveenaidu/gray/src/core/math"
 	"github.com/Naveenaidu/gray/src/rayt"
+	"github.com/Naveenaidu/gray/src/rendering"
 )
 
 // transformation matrix that orients the world relative to the eye
@@ -76,10 +78,10 @@ func NewCamera(hsize int, vsize int, fieldOfView float64) *Camera {
 }
 
 // Compute the world cooridates at the center of given pixel
-func RayForPixel(camera Camera, px float64, py float64) *rayt.Ray {
+func RayForPixel(camera Camera, px int, py int) *rayt.Ray {
 	// offset from edge of canvas to the pixel center
-	xOffset := (px + 0.5) * camera.PixelSize
-	yOffset := (py + 0.5) * camera.PixelSize
+	xOffset := (float64(px) + 0.5) * camera.PixelSize
+	yOffset := (float64(py) + 0.5) * camera.PixelSize
 
 	// untransformed coordinates of pixel in the worl space
 	// (camera looks towards -z, so +x is to the left) i.e
@@ -102,4 +104,18 @@ func RayForPixel(camera Camera, px float64, py float64) *rayt.Ray {
 	direction := pixel.Subtract(*origin).Normalize()
 
 	return &rayt.Ray{Origin: *origin, Direction: *direction}
+}
+
+func Render(camera Camera, world World) *rendering.Canvas {
+	image := rendering.NewCanvas(camera.Hsize, camera.Vsize, *color.Black)
+
+	for y := 0; y < camera.Vsize; y++ {
+		for x := 0; x < camera.Hsize; x++ {
+			ray := RayForPixel(camera, x, y)
+			color := ColorAt(world, *ray)
+			image.WritePixel(x, y, color)
+		}
+	}
+
+	return image
 }
