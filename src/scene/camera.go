@@ -1,7 +1,6 @@
 package scene
 
 import (
-	"fmt"
 	"math"
 
 	"github.com/Naveenaidu/gray/src/core/color"
@@ -58,11 +57,6 @@ func NewCamera(hsize int, vsize int, fieldOfView float64) *Camera {
 		halfWidth = halfView * float64(aspect)
 		halfHeight = halfView
 	}
-
-	fmt.Printf("halfView %v\n", halfView)
-	fmt.Printf("aspect %v\n", aspect)
-	fmt.Printf("halfWidth %v\n", halfWidth)
-	fmt.Printf("halfHeight %v\n", halfHeight)
 
 	pixelSize := halfWidth * 2 / float64(hsize)
 

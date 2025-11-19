@@ -10,6 +10,7 @@ import (
 	"github.com/Naveenaidu/gray/src/material"
 	"github.com/Naveenaidu/gray/src/rayt"
 	"github.com/Naveenaidu/gray/src/rendering"
+	"github.com/Naveenaidu/gray/src/scene"
 	"github.com/Naveenaidu/gray/src/shape"
 )
 
@@ -165,6 +166,97 @@ func drawSphereWithLight() {
 
 }
 
+func createSixSphereScene() {
+	// Create a new world
+	world := &scene.World{}
+
+	// 1. The floor is an extremely flattened sphere with a matte texture
+	floor := shape.UnitSphere()
+	floor.Transform = *core.ScaleM(10, 0.01, 10)
+	floor.Material = material.DefaultMaterial()
+	floor.Material.Color = *color.NewColor(1, 0.9, 0.9)
+	floor.Material.Specular = 0
+
+	// 2. The wall on the left
+	leftWall := shape.UnitSphere()
+	leftWall.Transform = *core.ChainTransforms([]*core.Matrix{
+		core.ScaleM(10, 0.01, 10),
+		core.RotateXM(math.Pi / 2),
+		core.RotateYM(-math.Pi / 4),
+		core.TranslationM(0, 0, 5),
+	})
+	leftWall.Material = floor.Material
+
+	// 3. The wall on the right
+	rightWall := shape.UnitSphere()
+	rightWall.Transform = *core.ChainTransforms([]*core.Matrix{
+		core.ScaleM(10, 0.01, 10),
+		core.RotateXM(math.Pi / 2),
+		core.RotateYM(math.Pi / 4),
+		core.TranslationM(0, 0, 5),
+	})
+	rightWall.Material = floor.Material
+
+	// 4. The large sphere in the middle
+	middle := shape.UnitSphere()
+	middle.Transform = *core.TranslationM(-0.5, 1, 0.5)
+	middle.Material = material.DefaultMaterial()
+	middle.Material.Color = *color.NewColor(0.1, 1, 0.5)
+	middle.Material.Diffuse = 0.7
+	middle.Material.Specular = 0.3
+
+	// 5. The smaller green sphere on the right
+	right := shape.UnitSphere()
+	right.Transform = *core.ChainTransforms([]*core.Matrix{
+		core.ScaleM(0.5, 0.5, 0.5),
+		core.TranslationM(1.5, 0.5, -0.5),
+	})
+	right.Material = material.DefaultMaterial()
+	right.Material.Color = *color.NewColor(0.5, 1, 0.1)
+	right.Material.Diffuse = 0.7
+	right.Material.Specular = 0.3
+
+	// 6. The smallest sphere
+	left := shape.UnitSphere()
+	left.Transform = *core.ChainTransforms([]*core.Matrix{
+		core.ScaleM(0.33, 0.33, 0.33),
+		core.TranslationM(-1.5, 0.33, -0.75),
+	})
+	left.Material = material.DefaultMaterial()
+	left.Material.Color = *color.NewColor(1, 0.8, 0.1)
+	left.Material.Diffuse = 0.7
+	left.Material.Specular = 0.3
+
+	// The light source is white, shining from above and to the left
+	light := lighting.NewLight(
+		*color.NewColor(1, 1, 1),
+		*core.NewPoint(-10, 10, -10),
+	)
+	// Add all spheres to the world
+	world.Spheres = append(world.Spheres, *floor, *leftWall, *rightWall, *middle, *right, *left)
+	world.Light = light
+
+	// Configure the camera
+	camera := scene.NewCamera(800, 600, math.Pi/3)
+	camera.Transform = *scene.ViewTransform(
+		*core.NewPoint(0, 1.5, -5), // from
+		*core.NewPoint(0, 1, 0),    // to
+		*core.NewVector(0, 1, 0),   // up
+	)
+
+	// Render the result to a canvas
+	canvas := scene.Render(*camera, *world)
+
+	// Save the image
+	err := canvas.WriteToPPM("six_spheres_scene.ppm")
+	if err != nil {
+		fmt.Printf("Error writing PPM file: %v\n", err)
+	} else {
+		fmt.Println("Scene rendered successfully to six_spheres_scene.ppm")
+	}
+}
+
 func main() {
-	drawSphereWithLight()
+	// drawSphereWithLight()
+	createSixSphereScene()
 }
