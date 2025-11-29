@@ -10,6 +10,11 @@ import (
 )
 
 // transformation matrix that orients the world relative to the eye
+/*
+- from: you specify where you want the eye to be in the scene
+- to: the point in the scene at which you want to look
+- up: the vector indication which direction is up
+*/
 func ViewTransform(from coreMath.Point, to coreMath.Point, up coreMath.Vector) *coreMath.Matrix {
 	forward := to.Subtract(from).Normalize()
 	upNormalized := up.Normalize()

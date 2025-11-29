@@ -237,7 +237,7 @@ func createSixSphereScene() {
 	world.Light = light
 
 	// Configure the camera
-	camera := scene.NewCamera(800, 600, math.Pi/3)
+	camera := scene.NewCamera(200, 200, math.Pi/3)
 	camera.Transform = *scene.ViewTransform(
 		*core.NewPoint(0, 1.5, -5), // from
 		*core.NewPoint(0, 1, 0),    // to
