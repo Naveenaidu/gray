@@ -48,7 +48,7 @@ func NewLight(intensity color.Color, pos core.Point) Light {
 	return Light{intensity, pos}
 }
 
-func Lighting(material material.Material, light Light, point core.Point, eyev core.Vector, normalv core.Vector) color.Color {
+func Lighting(material material.Material, light Light, point core.Point, eyev core.Vector, normalv core.Vector, inShadow bool) color.Color {
 	// combine the surface color with the light's color/intensity
 	effectiveColor := color.MultiplyColors([]color.Color{material.Color, light.Intensity})
 
@@ -60,22 +60,25 @@ func Lighting(material material.Material, light Light, point core.Point, eyev co
 	diffuse := color.Black
 	specular := color.Black
 
-	// light_dot_normal represents the cosine of the angle between the
-	// light vector and the normal vector. A negative number means the
-	// light is on the other side of the surface.
-	lightDotNormal := lightV.DotProduct(normalv)
-	if lightDotNormal > 0 {
-		diffuse = effectiveColor.ScalarMultiply(material.Diffuse).ScalarMultiply(lightDotNormal)
-	}
+	// ignore shadow and diffuse component if point is in shadow
+	if !inShadow {
+		// light_dot_normal represents the cosine of the angle between the
+		// light vector and the normal vector. A negative number means the
+		// light is on the other side of the surface.
+		lightDotNormal := lightV.DotProduct(normalv)
+		if lightDotNormal > 0 {
+			diffuse = effectiveColor.ScalarMultiply(material.Diffuse).ScalarMultiply(lightDotNormal)
+		}
 
-	// reflect_dot_eye represents the cosine of the angle between the
-	// reflection vector and the eye vector. A negative number means the
-	// light reflects away from the eye.
-	reflectV := Reflect(*lightV.ScalarMultiply(-1), normalv)
-	reflectDotEye := reflectV.DotProduct(eyev)
-	if reflectDotEye > 0 {
-		factor := math.Pow(reflectDotEye, float64(material.Shininess))
-		specular = light.Intensity.ScalarMultiply(material.Specular).ScalarMultiply(factor)
+		// reflect_dot_eye represents the cosine of the angle between the
+		// reflection vector and the eye vector. A negative number means the
+		// light reflects away from the eye.
+		reflectV := Reflect(*lightV.ScalarMultiply(-1), normalv)
+		reflectDotEye := reflectV.DotProduct(eyev)
+		if reflectDotEye > 0 {
+			factor := math.Pow(reflectDotEye, float64(material.Shininess))
+			specular = light.Intensity.ScalarMultiply(material.Specular).ScalarMultiply(factor)
+		}
 	}
 
 	return *color.AddColors([]color.Color{*ambient, *diffuse, *specular})

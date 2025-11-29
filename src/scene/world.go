@@ -17,12 +17,13 @@ type World struct {
 }
 
 type Computation struct {
-	T       float64
-	Object  shape.Sphere
-	Point   math.Point
-	EyeV    math.Vector
-	NormalV math.Vector
-	Inside  bool
+	T        float64
+	Object   shape.Sphere
+	Point    math.Point
+	EyeV     math.Vector
+	NormalV  math.Vector
+	Inside   bool
+	InShadow bool
 }
 
 func DefaultWorld() *World {
@@ -68,6 +69,7 @@ func PrepareComputations(intersection rayt.Intersection, ray rayt.Ray) *Computat
 	eyev := ray.Direction.Negate()
 	normalV := lighting.NormalAt(intersection.Object, *point)
 	inside := false
+	inShadow := false
 
 	// check if the ray is originating from inside of the sphere. If the eye
 	// vector and the normal vector are in opposite direction than the ray is
@@ -78,17 +80,18 @@ func PrepareComputations(intersection rayt.Intersection, ray rayt.Ray) *Computat
 	}
 
 	return &Computation{
-		T:       intersection.T,
-		Object:  intersection.Object,
-		Point:   *point,
-		EyeV:    *eyev,
-		NormalV: normalV,
-		Inside:  inside,
+		T:        intersection.T,
+		Object:   intersection.Object,
+		Point:    *point,
+		EyeV:     *eyev,
+		NormalV:  normalV,
+		Inside:   inside,
+		InShadow: inShadow,
 	}
 }
 
 func ShadeHit(world World, comps Computation) color.Color {
-	return lighting.Lighting(comps.Object.Material, world.Light, comps.Point, comps.EyeV, comps.NormalV)
+	return lighting.Lighting(comps.Object.Material, world.Light, comps.Point, comps.EyeV, comps.NormalV, comps.InShadow)
 }
 
 func ColorAt(world World, ray rayt.Ray) color.Color {

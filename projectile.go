@@ -154,7 +154,7 @@ func drawSphereWithLight() {
 				point := ray.Position(hit.T)
 				normal := lighting.NormalAt(hit.Object, *point)
 				eye := ray.Direction.Reverse()
-				color := lighting.Lighting(hit.Object.Material, light, *point, *eye, normal)
+				color := lighting.Lighting(hit.Object.Material, light, *point, *eye, normal, false)
 
 				canvas.WritePixel(int(pixel.X), int(pixel.Y), color)
 			}

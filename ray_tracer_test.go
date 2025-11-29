@@ -1537,7 +1537,7 @@ func TestLighting(t *testing.T) {
 	eyev := core.NewVector(0, 0, -1)
 	normalv := core.NewVector(0, 0, -1)
 	light := lighting.NewLight(*color.NewColor(1, 1, 1), *core.NewPoint(0, 0, -10))
-	result := lighting.Lighting(m, light, *position, *eyev, *normalv)
+	result := lighting.Lighting(m, light, *position, *eyev, *normalv, false)
 	expected := color.NewColor(1.9, 1.9, 1.9)
 	if !result.IsEqual(*expected) {
 		t.Errorf("Expected lighting result = %v, but got %v", expected, result)
@@ -1548,7 +1548,7 @@ func TestLighting(t *testing.T) {
 	eyev = core.NewVector(0, sqrtHalf, -sqrtHalf)
 	normalv = core.NewVector(0, 0, -1)
 	light = lighting.NewLight(*color.NewColor(1, 1, 1), *core.NewPoint(0, 0, -10))
-	result = lighting.Lighting(m, light, *position, *eyev, *normalv)
+	result = lighting.Lighting(m, light, *position, *eyev, *normalv, false)
 	expected = color.NewColor(1.0, 1.0, 1.0)
 	if !result.IsEqual(*expected) {
 		t.Errorf("Expected lighting result = %v, but got %v", expected, result)
@@ -1558,7 +1558,7 @@ func TestLighting(t *testing.T) {
 	eyev = core.NewVector(0, 0, -1)
 	normalv = core.NewVector(0, 0, -1)
 	light = lighting.NewLight(*color.NewColor(1, 1, 1), *core.NewPoint(0, 10, -10))
-	result = lighting.Lighting(m, light, *position, *eyev, *normalv)
+	result = lighting.Lighting(m, light, *position, *eyev, *normalv, false)
 	expected = color.NewColor(0.7364, 0.7364, 0.7364)
 	if !result.IsEqual(*expected) {
 		t.Errorf("Expected lighting result = %v, but got %v", expected, result)
@@ -1568,7 +1568,7 @@ func TestLighting(t *testing.T) {
 	eyev = core.NewVector(0, -sqrtHalf, -sqrtHalf)
 	normalv = core.NewVector(0, 0, -1)
 	light = lighting.NewLight(*color.NewColor(1, 1, 1), *core.NewPoint(0, 10, -10))
-	result = lighting.Lighting(m, light, *position, *eyev, *normalv)
+	result = lighting.Lighting(m, light, *position, *eyev, *normalv, false)
 	expected = color.NewColor(1.6364, 1.6364, 1.6364)
 	if !result.IsEqual(*expected) {
 		t.Errorf("Expected lighting result = %v, but got %v", expected, result)
@@ -1578,7 +1578,7 @@ func TestLighting(t *testing.T) {
 	eyev = core.NewVector(0, 0, -1)
 	normalv = core.NewVector(0, 0, -1)
 	light = lighting.NewLight(*color.NewColor(1, 1, 1), *core.NewPoint(0, 0, 10))
-	result = lighting.Lighting(m, light, *position, *eyev, *normalv)
+	result = lighting.Lighting(m, light, *position, *eyev, *normalv, false)
 	expected = color.NewColor(0.1, 0.1, 0.1)
 	if !result.IsEqual(*expected) {
 		t.Errorf("Expected lighting result = %v, but got %v", expected, result)
@@ -1980,5 +1980,34 @@ func TestRenderingWorldWithCamera(t *testing.T) {
 	pixel := image.PixelAt(5, 5)
 	if !pixel.IsEqual(*expected) {
 		t.Errorf("Expected pixel_at(image, 5, 5) = %v, but got %v", expected, pixel)
+	}
+}
+
+/* ------------- Shadows --------------- */
+func TestLightingWithSurfaceInShadow(t *testing.T) {
+	// Scenario: Lighting with the surface in shadow
+	// Setup common values
+	m := material.DefaultMaterial()
+	position := core.NewPoint(0, 0, 0)
+
+	// Given eyev ← vector(0, 0, -1)
+	eyev := core.NewVector(0, 0, -1)
+
+	// And normalv ← vector(0, 0, -1)
+	normalv := core.NewVector(0, 0, -1)
+
+	// And light ← point_light(point(0, 0, -10), color(1, 1, 1))
+	light := lighting.NewLight(*color.NewColor(1, 1, 1), *core.NewPoint(0, 0, -10))
+
+	// And in_shadow ← true
+	inShadow := true
+
+	// When result ← lighting(m, light, position, eyev, normalv, in_shadow)
+	result := lighting.Lighting(m, light, *position, *eyev, *normalv, inShadow)
+
+	// Then result = color(0.1, 0.1, 0.1)
+	expected := color.NewColor(0.1, 0.1, 0.1)
+	if !result.IsEqual(*expected) {
+		t.Errorf("Expected lighting result = %v, but got %v", expected, result)
 	}
 }
