@@ -108,3 +108,21 @@ func ColorAt(world World, ray rayt.Ray) color.Color {
 	return hitColor
 
 }
+
+func IsShadowed(world World, point math.Point) bool {
+	v := world.Light.Position.Subtract(point)
+	distance := v.Magnitude()
+	direction := v.Normalize()
+
+	// Shadow ray (light - point)
+	shadowRay := rayt.Ray{Origin: point, Direction: *direction}
+	// shadow ray and the intersection of that ray with world
+	intersections := IntersectWorld(world, shadowRay)
+
+	h := shadowRay.Hit(intersections)
+	if h != nil && h.T < distance {
+		return true
+	}
+	return false
+
+}

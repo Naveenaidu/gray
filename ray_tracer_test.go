@@ -2011,3 +2011,63 @@ func TestLightingWithSurfaceInShadow(t *testing.T) {
 		t.Errorf("Expected lighting result = %v, but got %v", expected, result)
 	}
 }
+
+func TestIsShadowed_NoShadowWhenNothingCollinear(t *testing.T) {
+	// Scenario: There is no shadow when nothing is collinear with point and light
+	// Given w ← default_world()
+	w := scene.DefaultWorld()
+
+	// And p ← point(0, 10, 0)
+	p := core.NewPoint(0, 10, 0)
+
+	// Then is_shadowed(w, p) is false
+	result := scene.IsShadowed(*w, *p)
+	if result != false {
+		t.Errorf("Expected is_shadowed(w, p) = false, but got %v", result)
+	}
+}
+
+func TestIsShadowed_ShadowWhenObjectBetweenPointAndLight(t *testing.T) {
+	// Scenario: The shadow when an object is between the point and the light
+	// Given w ← default_world()
+	w := scene.DefaultWorld()
+
+	// And p ← point(10, -10, 10)
+	p := core.NewPoint(10, -10, 10)
+
+	// Then is_shadowed(w, p) is true
+	result := scene.IsShadowed(*w, *p)
+	if result != true {
+		t.Errorf("Expected is_shadowed(w, p) = true, but got %v", result)
+	}
+}
+
+func TestIsShadowed_NoShadowWhenObjectBehindLight(t *testing.T) {
+	// Scenario: There is no shadow when an object is behind the light
+	// Given w ← default_world()
+	w := scene.DefaultWorld()
+
+	// And p ← point(-20, 20, -20)
+	p := core.NewPoint(-20, 20, -20)
+
+	// Then is_shadowed(w, p) is false
+	result := scene.IsShadowed(*w, *p)
+	if result != false {
+		t.Errorf("Expected is_shadowed(w, p) = false, but got %v", result)
+	}
+}
+
+func TestIsShadowed_NoShadowWhenObjectBehindPoint(t *testing.T) {
+	// Scenario: There is no shadow when an object is behind the point
+	// Given w ← default_world()
+	w := scene.DefaultWorld()
+
+	// And p ← point(-2, 2, -2)
+	p := core.NewPoint(-2, 2, -2)
+
+	// Then is_shadowed(w, p) is false
+	result := scene.IsShadowed(*w, *p)
+	if result != false {
+		t.Errorf("Expected is_shadowed(w, p) = false, but got %v", result)
+	}
+}
