@@ -4,10 +4,10 @@ import (
 	"math"
 )
 
-const floatEqualityThreshold = 1e-5
+const EPSILON = 1e-5
 
 func IsFloatEqual(a, b float64) bool {
-	return math.Abs(a-b) <= floatEqualityThreshold
+	return math.Abs(a-b) <= EPSILON
 }
 
 func Clamp(f float64) float64 {
