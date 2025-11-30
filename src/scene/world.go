@@ -91,7 +91,8 @@ func PrepareComputations(intersection rayt.Intersection, ray rayt.Ray) *Computat
 }
 
 func ShadeHit(world World, comps Computation) color.Color {
-	return lighting.Lighting(comps.Object.Material, world.Light, comps.Point, comps.EyeV, comps.NormalV, comps.InShadow)
+	inShadow := IsShadowed(world, comps.Point)
+	return lighting.Lighting(comps.Object.Material, world.Light, comps.Point, comps.EyeV, comps.NormalV, inShadow)
 }
 
 func ColorAt(world World, ray rayt.Ray) color.Color {
